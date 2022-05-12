@@ -1,0 +1,15 @@
+{
+  "name": "jaime",
+  "version": "1.0.0",
+  "description": "A useful helper to build environments and run scripts",
+  "main": "server.js",
+  "author": "Ezequiel Streitenberger <ezequiel@estreiten.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/estreiten/jaime.git"
+  },
+  "homepage": "https://github.com/estreiten/jaime",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
