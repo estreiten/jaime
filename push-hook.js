@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { exec } = require("child_process");
 
 const getEnv = (branch) => {
   const environments = require('./config').env;
