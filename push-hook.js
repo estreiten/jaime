@@ -42,7 +42,7 @@ const formatDate = (date) => {
 const log = (file, txt) => {
   let line = formatDate(new Date())
   line += txt ? txt + '\n' : '\n'
-  fs.writeFileSync(file, txt, {flag: 'a+'});
+  fs.writeFileSync(file, line, {flag: 'a+'});
 }
 
 module.exports = {
