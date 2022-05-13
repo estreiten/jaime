@@ -75,6 +75,7 @@ module.exports = {
           } else {
             console.log(`No environment is connected to the ${branch} branch`)
           }
+          console.log(`${branch} branch processing finished`)
         }
         res.sendStatus(200)
       } catch (err) {
