@@ -22,11 +22,17 @@ const runScript = (step, {env, branch, logFile, logStream}) => {
   if (fs.existsSync(scriptFile)) {
     log(logFile, `${env.name} environment ${name} started`)
     const process = spawnSync(scriptFile, [branch], {cwd: env.path})
-    process.stdout.pipe(logStream)
-    process.stderr.pipe(logStream)
-    process.on('close', code => {
-      return code
-    })
+    log(logFile, process.output[0])
+    if (process.output[1]) {
+      log(logFile, `stdout: ${process.output[1]}`)
+    }
+    if (process.output[2]) {
+      log(logFile, `stderr: ${process.output[2]}`)
+    }
+    if (process.error) {
+      log(logFile, `error ${process.error.name}: ${process.error.message}`)
+    }
+    return process.status
   } else {
     log(logFile, `No ${env.name} environment ${name} script was found`)
   }
