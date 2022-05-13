@@ -38,8 +38,15 @@ const runScript = (step, {env, branch, logFile, logStream}) => {
   }
 }
 
+const num = (number) => {
+  return number.toLocaleString('en-US', {
+    minimumIntegerDigits: 2,
+    useGrouping: false
+  })
+}
+
 const formatDate = (date) => {
-  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+  return `${date.getFullYear()}-${num(date.getMonth())}-${num(date.getDate())} ${num(date.getHours())}:${num(date.getMinutes())}:${num(date.getSeconds())}`
 }
 
 const log = (file, txt) => {
