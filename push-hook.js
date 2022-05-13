@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { execSync } = require("child_process");
+const { spawn } = require("child_process");
 
 const getEnv = (branch) => {
   const environments = require('./config').env;
@@ -16,19 +16,16 @@ const getEnv = (branch) => {
   return false
 }
 
-const runScript = (step, {env, branch, logFile}) => {
+const runScript = (step, {env, branch, logFile, logStream}) => {
   const name = step === 'post' ? 'post-build' : step
   const scriptFile = step === 'update' ? `${__dirname}/update.sh` : `${__dirname}/env/${env.name}/${step}.sh`
   if (fs.existsSync(scriptFile)) {
     log(logFile, `${env.name} environment ${name} started`)
-    execSync(`${scriptFile} ${branch} >> ${logFile}`, {cwd: env.path}, (error, stdout, stderr) => {
-      if (error) {
-        log(logFile, `error: ${error.message}`);
-      }
-      if (stderr) {
-        log(logFile, `stderr: ${stderr}`);
-      }
-      log(logFile, `stdout: ${stdout}`);
+    const process = spawn(scriptFile, [branch], {cwd: env.path})
+    process.stdout.pipe(logStream)
+    process.stderr.pipe(logStream)
+    process.on('close', code => {
+      return code
     })
   } else {
     log(logFile, `No ${env.name} environment ${name} script was found`)
@@ -68,9 +65,10 @@ module.exports = {
           const env = getEnv(branch)
           if (env) {
             const logFile = `${__dirname}/env/${env.name}/logs/${(new Date()).getTime()}.log`
-            runScript('update', {env, branch, logFile})
-            runScript('build', {env, branch, logFile})
-            runScript('post', {env, branch, logFile})
+            const logStream = fs.createWriteStream(logFile, { flags: 'a' });
+            runScript('update', {env, branch, logFile, logStream})
+            runScript('build', {env, branch, logFile, logStream})
+            runScript('post', {env, branch, logFile, logStream})
             log(logFile, `The ${env.name} environment has been updated`)
           } else {
             console.log(`No environment is connected to the ${branch} branch`)
