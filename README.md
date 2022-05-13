@@ -35,4 +35,5 @@
     ````
 
     Note: make sure that the script files have the corresponding permissions to be executed by Jaime.
-5. Run with `npm start` and wait for the Github push hooks.
+5. Assure that the ``update.sh`` script in the Jaime root has execute permissions for the user that will start Jaime.
+6. Run with `npm start` and wait for the Github push hooks.
