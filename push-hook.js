@@ -68,6 +68,7 @@ module.exports = {
           const env = getEnv(branch)
           if (env) {
             const logFile = `${__dirname}/env/${env.name}/logs/${(new Date()).getTime()}.log`
+            runScript('update', {env, branch, logFile})
             runScript('build', {env, branch, logFile})
             runScript('post', {env, branch, logFile})
             log(logFile, `The ${env.name} environment has been updated`)
