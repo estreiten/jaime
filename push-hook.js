@@ -18,7 +18,7 @@ const getEnv = (branch) => {
 
 const runScript = (step, {env, branch, logFile}) => {
   const name = step === 'post' ? 'post-build' : step
-  const scriptFile = step === 'update' ? 'update.sh' : `${__dirname}/env/${env.name}/${step}.sh`
+  const scriptFile = step === 'update' ? `${__dirname}/update.sh` : `${__dirname}/env/${env.name}/${step}.sh`
   if (fs.existsSync(scriptFile)) {
     log(logFile, `${env.name} environment ${name} started`)
     execSync(`${scriptFile} ${branch} >> ${logFile}`, {cwd: env.path}, (error, stdout, stderr) => {
