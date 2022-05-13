@@ -31,6 +31,7 @@ const runScript = (step, {env, branch, logFile, logStream}) => {
     if (process.error) {
       log(logFile, `error ${process.error.name}: ${process.error.message}`)
     }
+    log(logFile, `The ${env.name} environment ${name} process ${process.status === 0 ? 'succeded' : 'failed'}`)
     return process.status
   } else {
     log(logFile, `No ${env.name} environment ${name} script was found`)
