@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { spawn } = require("child_process");
+const { spawnSync } = require("child_process");
 
 const getEnv = (branch) => {
   const environments = require('./config').env;
@@ -21,7 +21,7 @@ const runScript = (step, {env, branch, logFile, logStream}) => {
   const scriptFile = step === 'update' ? `${__dirname}/update.sh` : `${__dirname}/env/${env.name}/${step}.sh`
   if (fs.existsSync(scriptFile)) {
     log(logFile, `${env.name} environment ${name} started`)
-    const process = spawn(scriptFile, [branch], {cwd: env.path})
+    const process = spawnSync(scriptFile, [branch], {cwd: env.path})
     process.stdout.pipe(logStream)
     process.stderr.pipe(logStream)
     process.on('close', code => {
