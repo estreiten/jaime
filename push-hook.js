@@ -4,9 +4,10 @@ const getEnv = (branch) => {
   const environments = require('./config').env;
   for (const envName in environments) {
     if (Object.hasOwnProperty.call(environments, envName)) {
-      const env = environments[envName];
+      let env = environments[envName];
       const hasBranch = env.branchStart ? branch.startsWith(env.branch) : branch === env.branch
       if (hasBranch) {
+        env.name = envName
         return env
       }
     }
@@ -16,9 +17,9 @@ const getEnv = (branch) => {
 
 const runScript = (step, {env, branch, logFile}) => {
   const name = step === 'post' ? 'post-build' : step
-  const scriptFile = step === 'update' ? 'update.sh' : `${__dirname}/env/${env}/${step}.sh`
+  const scriptFile = step === 'update' ? 'update.sh' : `${__dirname}/env/${env.name}/${step}.sh`
   if (fs.existsSync(scriptFile)) {
-    log(logFile, `${env} environment ${name} started`)
+    log(logFile, `${env.name} environment ${name} started`)
     exec(`${scriptFile} ${branch} >> ${logFile}`, {cwd: env.path}, (error, stdout, stderr) => {
       if (error) {
         log(logFile, `error: ${error.message}`);
@@ -29,7 +30,7 @@ const runScript = (step, {env, branch, logFile}) => {
       log(logFile, `stdout: ${stdout}`);
     })
   } else {
-    log(logFile, `No ${env} environment ${name} script was found`)
+    log(logFile, `No ${env.name} environment ${name} script was found`)
   }
 }
 
@@ -65,10 +66,10 @@ module.exports = {
           console.log(`${branch} branch update detected`)
           const env = getEnv(branch)
           if (env) {
-            const logFile = `${__dirname}/env/${env}/logs/${date.getTime()}.log`
+            const logFile = `${__dirname}/env/${env.name}/logs/${(new Date()).getTime()}.log`
             runScript('build', {env, branch, logFile})
             runScript('post', {env, branch, logFile})
-            log(logFile, `The ${env} environment has been updated`)
+            log(logFile, `The ${env.name} environment has been updated`)
           } else {
             console.log(`No environment is connected to the ${branch} branch`)
           }
