@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { exec } = require("child_process");
+const { execSync } = require("child_process");
 
 const getEnv = (branch) => {
   const environments = require('./config').env;
@@ -21,7 +21,7 @@ const runScript = (step, {env, branch, logFile}) => {
   const scriptFile = step === 'update' ? 'update.sh' : `${__dirname}/env/${env.name}/${step}.sh`
   if (fs.existsSync(scriptFile)) {
     log(logFile, `${env.name} environment ${name} started`)
-    exec(`${scriptFile} ${branch} >> ${logFile}`, {cwd: env.path}, (error, stdout, stderr) => {
+    execSync(`${scriptFile} ${branch} >> ${logFile}`, {cwd: env.path}, (error, stdout, stderr) => {
       if (error) {
         log(logFile, `error: ${error.message}`);
       }
@@ -41,7 +41,7 @@ const formatDate = (date) => {
 
 const log = (file, txt) => {
   let line = formatDate(new Date())
-  line += txt ? txt : ''
+  line += txt ? txt + '\n' : '\n'
   fs.writeFileSync(file, txt, {flag: 'a+'});
 }
 
