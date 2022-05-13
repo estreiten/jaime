@@ -60,7 +60,7 @@ module.exports = {
 
     app.post('/', async (req, res) => {
       try {
-        console.log(formatDate(new Date()))
+        console.log('\n' + formatDate(new Date()))
         console.log('post received')
         if (req.body.ref.startsWith('refs/heads/')) {
           const branch = req.body.ref.substring(11)
@@ -76,6 +76,7 @@ module.exports = {
             console.log(`No environment is connected to the ${branch} branch`)
           }
           console.log(`${branch} branch processing finished`)
+          console.log(formatDate(new Date()))
         }
         res.sendStatus(200)
       } catch (err) {
