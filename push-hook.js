@@ -20,7 +20,7 @@ const runScript = (step, {env, branch, logFile, logStream}) => {
   const name = step === 'post' ? 'post-build' : step
   const scriptFile = step === 'update' ? `${__dirname}/update.sh` : `${__dirname}/env/${env.name}/${step}.sh`
   if (fs.existsSync(scriptFile)) {
-    log(logFile, `${env.name} environment ${name} started`)
+    log(logFile, `===== ${env.name} environment ${name} started =====`)
     const process = spawnSync(scriptFile, [branch], {cwd: env.path})
     if (process.stdout && process.stdout.length > 0) {
       log(logFile, `${process.stdout}`)
@@ -31,10 +31,10 @@ const runScript = (step, {env, branch, logFile, logStream}) => {
     if (process.error) {
       log(logFile, `error ${process.error.name}: ${process.error.message}`)
     }
-    console.log(`exit status: ${process.status}`)
     return process.status
   } else {
     log(logFile, `No ${env.name} environment ${name} script was found`)
+    return 0
   }
 }
 
@@ -79,10 +79,18 @@ module.exports = {
           if (env) {
             const logFile = `${__dirname}/env/${env.name}/logs/${(new Date()).getTime()}.log`
             const logStream = fs.createWriteStream(logFile, { flags: 'a' });
-            runScript('update', {env, branch, logFile, logStream})
-            runScript('build', {env, branch, logFile, logStream})
-            runScript('post', {env, branch, logFile, logStream})
-            log(logFile, `The ${env.name} environment has been updated`)
+            let status = runScript('update', {env, branch, logFile, logStream})
+            if (status === 0) {
+              status = runScript('build', {env, branch, logFile, logStream})
+            }
+            if (status === 0) {
+              status = runScript('post', {env, branch, logFile, logStream})
+            }
+            if (status === 0) {
+              log(logFile, `===== The ${env.name} environment has been updated =====`)
+            } else {
+              log(logFile, `===== The ${env.name} environment update failed =====`)
+            }
           } else {
             console.log(`No environment is connected to the ${branch} branch`)
           }
