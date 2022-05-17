@@ -7,12 +7,8 @@ module.exports = {
     const express = require('express');
     const app = express();
 
-    app.use(express.json({
-      extended: true
-    }))
-    app.use(express.urlencoded({
-      extended: true
-    }))
+    app.use(express.json({extended: true}))
+    app.use(express.urlencoded({extended: true}))
 
     app.post('/', async (req, res) => {
       try {
@@ -28,12 +24,13 @@ module.exports = {
         res.sendStatus(200)
       } catch (err) {
         console.error(err.message)
+        res.sendStatus(500)
       }
     })
 
-    const port = config.port || 80
+    const port = config.port || 4000
     app.listen(port, () => {
-      console.log(`listening on ${port}`)
+      console.log(`Github push hook listening on ${port}`)
     })
   }
 }
