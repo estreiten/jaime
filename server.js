@@ -1,6 +1,7 @@
 const config = require('./config');
 const hookListener = require('./push-hook.js');
 const authService = require('./auth.js');
+const envManager = require('./env.js')
 
 const express = require('express');
 const app = express();
@@ -23,7 +24,7 @@ app.get('/', async (req, res) => {
   }
 })
 
-app.get('/init', async (req, res) => {
+app.get('/router', async (req, res) => {
   try {
     if (authorized(req)) {
       res.setHeader('view', 'board')
@@ -45,6 +46,21 @@ app.post('/login', async (req, res) => {
         res.send(config.auth.token).status(200)
       } else {
         res.sendStatus(403)
+      }
+    } else {
+      res.redirect('/')
+    }
+  } catch (err) {
+    console.error(err.message)
+    res.sendStatus(500)
+  }
+})
+
+app.post('/update', async (req, res) => {
+  try {
+    if (authorized(req)) {
+      if (!!req.body.env && Object.keys(config.env).indexOf(req.body.env)) {
+        res.sendStatus(envManager.updateByEnvName(req.body.env) === 0 ? 200 : 500)
       }
     } else {
       res.redirect('/')
