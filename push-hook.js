@@ -17,7 +17,7 @@ module.exports = {
         if (req.body.ref.startsWith('refs/heads/')) {
           const branch = req.body.ref.substring(11)
           console.log(`${branch} branch update detected`)
-          envManager.update(branch)
+          envManager.updateByBranch(branch)
           console.log(`${branch} branch processing finished`)
           console.log(util.formatDate(new Date()))
         }

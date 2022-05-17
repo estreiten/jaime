@@ -1,5 +1,7 @@
 git fetch
 sleep 5
 git checkout -- .
-git checkout $1
+if [ -n "$1" ]; then
+  git checkout $1
+fi
 git pull

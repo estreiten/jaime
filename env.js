@@ -2,8 +2,21 @@ const fs = require('fs');
 const { spawnSync } = require("child_process");
 const util = require('./utils.js')
 
+const getEnvByName = (name) => {
+  const environments = require('./config').env;
+  for (const envName in environments) {
+    if (Object.hasOwnProperty.call(environments, envName)) {
+      if (name === envName) {
+        let env = environments[envName];
+        env.name = envName
+        return env
+      }
+    }
+  }
+  return false
+}
 
-const getEnv = (branch) => {
+const getEnvByBranch = (branch) => {
   const environments = require('./config').env;
   for (const envName in environments) {
     if (Object.hasOwnProperty.call(environments, envName)) {
@@ -21,9 +34,10 @@ const getEnv = (branch) => {
 const runScript = (step, {env, branch, logFile}) => {
   const name = step === 'post' ? 'post-build' : step
   const scriptFile = step === 'update' ? `${__dirname}/update.sh` : `${__dirname}/env/${env.name}/${step}.sh`
+  const params = branch ? [branch] : null
   if (fs.existsSync(scriptFile)) {
     log(logFile, `===== ${env.name} environment ${name} started =====`)
-    const process = spawnSync(scriptFile, [branch], {cwd: env.path})
+    const process = spawnSync(scriptFile, params, {cwd: env.path})
     if (process.stdout && process.stdout.length > 0) {
       log(logFile, `${process.stdout}`)
     }
@@ -49,25 +63,35 @@ const log = (file, txt) => {
   });
 }
 
-module.exports = {
-  update: (branch) => {
-    const env = getEnv(branch)
-    if (env) {
-      const logFile = `${__dirname}/env/${env.name}/logs/${(new Date()).getTime()}.log`
-      let status = runScript('update', {env, branch, logFile})
-      if (status === 0) {
-        status = runScript('build', {env, branch, logFile})
-      }
-      if (status === 0) {
-        status = runScript('post', {env, branch, logFile})
-      }
-      if (status === 0) {
-        log(logFile, `===== The ${env.name} environment has been updated =====`)
-      } else {
-        log(logFile, `===== The ${env.name} environment update failed =====`)
-      }
-    } else {
-      console.log(`No environment is connected to the ${branch} branch`)
+const update = (env, branch) => {
+  if (env) {
+    const logFile = `${__dirname}/env/${env.name}/logs/${(new Date()).getTime()}.log`
+    let status = runScript('update', {env, branch, logFile})
+    if (status === 0) {
+      status = runScript('build', {env, branch, logFile})
     }
+    if (status === 0) {
+      status = runScript('post', {env, branch, logFile})
+    }
+    if (status === 0) {
+      log(logFile, `===== The ${env.name} environment has been updated =====`)
+    } else {
+      log(logFile, `===== The ${env.name} environment update failed =====`)
+    }
+    return status
+  } else {
+    console.log(`No environment is connected to the ${branch} branch`)
+    return 1
+  }
+}
+
+module.exports = {
+  updateByEnvName: (envName) => {
+    const env = getEnvByName(envName)
+    return update(env, branch)
+  },
+  updateByBranch: (branch) => {
+    const env = getEnvByBranch(branch)
+    return update(env, branch)
   }
 }
