@@ -1,2 +1,62 @@
-const hookListener = require('./push-hook.js')
-hookListener.init()
+const config = require('./config');
+const hookListener = require('./push-hook.js');
+const authService = require('./auth.js');
+
+const express = require('express');
+const app = express();
+
+app.use(express.json({extended: true}))
+app.use(express.urlencoded({extended: true}))
+app.use(express.static('public'))
+
+const authorized = (req) => {
+  const token = req.headers['token']
+  return !config.auth || !config.auth.token || token === config.auth.token
+}
+
+app.get('/', async (req, res) => {
+  try {
+    res.sendFile('index.html', {root: '.'})
+  } catch (err) {
+    console.error(err.message)
+    res.sendStatus(500)
+  }
+})
+
+app.get('/init', async (req, res) => {
+  try {
+    if (authorized(req)) {
+      res.setHeader('view', 'board')
+      res.sendFile('views/board.html', {root: '.'})
+    } else {
+      res.setHeader('view', 'login')
+      res.sendFile('views/login.html', {root: '.'})
+    }
+  } catch (err) {
+    console.error(err.message)
+    res.sendStatus(500)
+  }
+})
+
+app.post('/login', async (req, res) => {
+  try {
+    if (!authorized(req)) {
+      if (authService.login(req.body.pass)) {
+        res.send(config.auth.token).status(200)
+      } else {
+        res.sendStatus(403)
+      }
+    } else {
+      res.redirect('/')
+    }
+  } catch (err) {
+    console.error(err.message)
+    res.sendStatus(500)
+  }
+})
+
+const port = config.port || 80
+app.listen(port, () => {
+  console.log(`Jaime listening on ${port}`)
+  hookListener.init()
+})
