@@ -87,7 +87,7 @@ const update = (env, branch) => {
 module.exports = {
   updateByEnvName: (envName) => {
     const env = getEnvByName(envName)
-    return update(env, branch)
+    return update(env)
   },
   updateByBranch: (branch) => {
     const env = getEnvByBranch(branch)

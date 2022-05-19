@@ -59,9 +59,12 @@ app.post('/login', async (req, res) => {
 
 app.post('/update', async (req, res) => {
   try {
+    console.log('update trigger received for', req.body.env)
     if (authorized(req)) {
-      if (!!req.body.env && Object.keys(config.env).indexOf(req.body.env)) {
+      if (!!req.body.env && Object.keys(config.env).indexOf(req.body.env) > -1) {
         res.sendStatus(envManager.updateByEnvName(req.body.env) === 0 ? 200 : 500)
+      } else {
+        res.sendStatus(400)
       }
     } else {
       res.redirect('/')
