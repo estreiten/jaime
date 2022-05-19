@@ -75,6 +75,23 @@ app.post('/update', async (req, res) => {
   }
 })
 
+app.get('/log', async (req, res) => {
+  try {
+    if (authorized(req)) {
+      if (!!req.query.env && !!req.query.date) {
+        res.sendFile(envManager.getLogPath(req.query.env, req.query.date), {root: '.'})
+      } else {
+        res.sendStatus(400)
+      }
+    } else {
+      res.sendStatus(403)
+    }
+  } catch (err) {
+    console.error(err.message)
+    res.sendStatus(500)
+  }
+})
+
 const port = config.port || 80
 app.listen(port, () => {
   console.log(`Jaime listening on ${port}`)

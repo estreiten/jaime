@@ -12,14 +12,14 @@ const request = (url, method, data) => {
     opts.headers['Content-Type'] = 'application/json'
     opts.body = JSON.stringify(data)
   }
-  fetch(url, opts)
+  return fetch(url, opts)
   .then(async response => {
     if (response.redirected) {
       window.location.href = response.url
     } else {
       const view = response.headers.get('view')
       if (view) {
-        document.body.innerHTML = await response.text()
+        document.querySelector('main').innerHTML = await response.text()
         if (view === 'login') {
           loginScript()
         }
@@ -56,4 +56,20 @@ const loginScript = () => {
       });
     });
   }
+}
+
+const updateEnv = async (env, status) => {
+  if (status === -1) {
+    setTimeout(() => {location.reload()}, 2000)
+  } else {
+    await request('/update','post',{env})
+    location.reload()
+  }
+}
+
+const showLog = async (env, log, status) => {
+  const logTxt = await request(`/log?env=${env}&date=${log}`, 'get')
+  document.querySelector('main').innerHTML = `
+    <h2 class="${status > 0 ? 'status-error' : 'status-ok'} pa-4">${new Date(log).toLocaleDateString()} ${new Date(log).toLocaleTimeString()}</h2>
+    <pre><code>${logTxt}</code></pre>`
 }

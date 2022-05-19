@@ -64,7 +64,8 @@ const log = (file, txt) => {
 
 const update = (env, branch) => {
   if (env) {
-    const logFile = `${__dirname}/env/${env.name}/logs/${(new Date()).getTime()}.log`
+    const logName = `${__dirname}/env/${env.name}/logs/${(new Date()).getTime()}`
+    const logFile = `${logName}.log`
     let status = runScript('update', {env, branch, logFile})
     if (status === 0) {
       status = runScript('build', {env, branch, logFile})
@@ -77,11 +78,28 @@ const update = (env, branch) => {
     } else {
       log(logFile, `===== The ${env.name} environment update failed =====`)
     }
+    fs.renameSync(logFile, `${logName}-${status === null ? 1 : status}.log`)
     return status
   } else {
     console.log(`No environment is connected to the ${branch} branch`)
     return 1
   }
+}
+
+const getEnvLogs = (envName) => {
+  let logs = []
+  const logsPath = `${__dirname}/env/${envName}/logs`
+  const logFiles = fs.readdirSync(logsPath)
+  for (let index = 0; index < logFiles.length; index++) {
+    const logFile = logFiles[index];
+    const separator = logFile.indexOf('-');
+    const ext = logFile.indexOf('.log');
+    logs.push({
+      date: separator > -1 ? logFile.substring(0, separator) : logFile.substring(0, ext),
+      status: separator > -1 ? logFile.substring(separator + 1, ext) : -1
+    })
+  }
+  return logs.sort((logA, logB) => logB.date - logA.date)
 }
 
 module.exports = {
@@ -99,9 +117,16 @@ module.exports = {
       if (Object.hasOwnProperty.call(environments, envName)) {
         let env = environments[envName];
         env.name = envName
+        env.logs = getEnvLogs(envName)
         envs.push(env)
       }
     }
     return envs
+  },
+  getLogPath: (env, date) => {
+    const logsPath = `${__dirname}/env/${env}/logs`
+    const logFiles = fs.readdirSync(logsPath)
+    const logFile = logFiles.find(logFile => logFile.startsWith(date))
+    return `env/${env}/logs/${logFile}`
   }
 }
