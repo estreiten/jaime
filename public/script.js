@@ -17,10 +17,14 @@ const request = (url, method, data) => {
     if (response.redirected) {
       window.location.href = response.url
     } else {
-      document.body.innerHTML = await response.text()
       const view = response.headers.get('view')
-      if (view === 'login') {
-        loginScript()
+      if (view) {
+        document.body.innerHTML = await response.text()
+        if (view === 'login') {
+          loginScript()
+        }
+      } else {
+        return response.text()
       }
     }
   })
