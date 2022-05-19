@@ -1,9 +1,9 @@
 const fs = require('fs');
 const { spawnSync } = require("child_process");
-const util = require('./utils.js')
+const util = require('./utils.js');
+const environments = require('./config').env;
 
 const getEnvByName = (name) => {
-  const environments = require('./config').env;
   for (const envName in environments) {
     if (Object.hasOwnProperty.call(environments, envName)) {
       if (name === envName) {
@@ -17,7 +17,6 @@ const getEnvByName = (name) => {
 }
 
 const getEnvByBranch = (branch) => {
-  const environments = require('./config').env;
   for (const envName in environments) {
     if (Object.hasOwnProperty.call(environments, envName)) {
       let env = environments[envName];
@@ -93,5 +92,16 @@ module.exports = {
   updateByBranch: (branch) => {
     const env = getEnvByBranch(branch)
     return update(env, branch)
+  },
+  getEnvironments: () => {
+    let envs = []
+    for (const envName in environments) {
+      if (Object.hasOwnProperty.call(environments, envName)) {
+        let env = environments[envName];
+        env.name = envName
+        envs.push(env)
+      }
+    }
+    return envs
   }
 }

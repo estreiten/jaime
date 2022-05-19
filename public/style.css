@@ -1,0 +1,24 @@
+/* layouts */
+.flex {
+  display: flex;
+}
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* colors */
+.white-blue {
+  color: rgb(225,225,255);
+  background-color: rgb(0,0,100);
+}
+
+/* elements */
+.btn {
+  border-radius: 4px;
+  box-shadow: 0px 4px 4px rgba(0,0,0,0.25);
+  padding: 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}

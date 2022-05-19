@@ -1,7 +1,8 @@
 const config = require('./config');
 const hookListener = require('./push-hook.js');
 const authService = require('./auth.js');
-const envManager = require('./env.js')
+const envManager = require('./env.js');
+const board = require('./board.js');
 
 const express = require('express');
 const app = express();
@@ -28,7 +29,7 @@ app.get('/router', async (req, res) => {
   try {
     if (authorized(req)) {
       res.setHeader('view', 'board')
-      res.sendFile('views/board.html', {root: '.'})
+      res.send(board.draw())
     } else {
       res.setHeader('view', 'login')
       res.sendFile('views/login.html', {root: '.'})
