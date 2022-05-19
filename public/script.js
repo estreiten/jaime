@@ -45,7 +45,7 @@ const loginScript = () => {
         } else {
           document.getElementById('passError').style.display = 'none'
           localStorage['token'] = token
-          request('/init')
+          request('/router')
         }
       }).catch((error) => {
         console.error('Error:', error)
