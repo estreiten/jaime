@@ -8,6 +8,6 @@ const num = (number) => {
 module.exports = {
   num,
   formatDate: (date) => {
-    return `${date.getFullYear()}-${num(date.getMonth())}-${num(date.getDate())} ${num(date.getHours())}:${num(date.getMinutes())}:${num(date.getSeconds())}`
+    return `${date.getFullYear()}-${num(date.getMonth()+1)}-${num(date.getDate())} ${num(date.getHours())}:${num(date.getMinutes())}:${num(date.getSeconds())}`
   }
 }
