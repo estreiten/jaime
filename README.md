@@ -41,5 +41,13 @@
 --------------
 
 ### Script parameters
-When triggered by a Github push hook, the scripts will receive the branch updated as parameter.
-If triggered manually, the scripts will not receive any parameter.
+When triggered by a Github push hook, the scripts will receive two parameters:
+ 1. the name of the branch updated
+ 2. the path of the output log
+When triggered manually, the scripts will receive one parameter:
+ 1. the path of the output log
+  It won't receive the updated branch here, since the update won't imply any branch change.
+
+### Coming next
+- Generic envs: create a specific folder for scripts to run on every environment, adding the env name as parameter.
+- Board visual improvements

@@ -33,7 +33,7 @@ const getEnvByBranch = (branch) => {
 const runScript = (step, {env, branch, logFile}) => {
   const name = step === 'post' ? 'post-build' : step
   const scriptFile = step === 'update' ? `${__dirname}/update.sh` : `${__dirname}/env/${env.name}/${step}.sh`
-  const params = branch ? [branch] : null
+  const params = branch ? [branch, logFile] : [logFile]
   if (fs.existsSync(scriptFile)) {
     log(logFile, `===== ${env.name} environment ${name} started =====`)
     const process = spawnSync(scriptFile, params, {cwd: env.path})
