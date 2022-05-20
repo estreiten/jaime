@@ -1,5 +1,11 @@
 body {
-  cursor: default
+  cursor: default;
+  margin: 0;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+#main {
+  margin: 16px
 }
 
 /* layouts */
@@ -10,16 +16,25 @@ body {
   display: flex;
   flex-direction: column;
 }
-.justify-spaceAround {
-  justify-content: space-around;
-}
-.align-center {
-  align-items: center;
+.flex-max {
+  flex: 1 0 auto
 }
 .flex-main {
   flex: 1 0 auto;
   text-align: center;
   text-transform: uppercase;
+}
+.justify-spaceAround {
+  justify-content: space-around;
+}
+.justify-spaceBetween {
+  justify-content: space-between;
+}
+.align-center {
+  align-items: center;
+}
+.align-self-start {
+  align-self: flex-start;
 }
 
 /* space */
@@ -28,6 +43,18 @@ body {
 }
 .pa-4 {
   padding: 16px
+}
+.pa-2 {
+  padding: 8px
+}
+.pr-8 {
+  padding-right: 24px
+}
+.v-separator {
+  height: inherit;
+  width: 1px;
+  opacity: 0.5;
+  background-color: rgb(225,225,255)
 }
 
 /* colors */
@@ -41,6 +68,12 @@ body {
 .status-error {
   background-color: rgb(250,200,200)
 }
+.text-ok {
+  color: rgb(150, 200, 150)
+}
+.text-error {
+  color: rgb(200, 150, 150)
+}
 
 /* elements */
 .top-menu {
@@ -48,9 +81,12 @@ body {
   align-items: center;
   color: rgb(225,225,255);
   background-color: rgb(0,0,50);
-  box-shadow: 4px 0px 4px rgba(0,0,0,0.25);
-  padding: 12px;
+  box-shadow: 8px 0px 8px rgba(0,0,50,0.75);
+  padding: 6px 12px;
   margin-bottom: 8px;
+  height: 28px;
+  position: sticky;
+  top: 0
 }
 .top-menu * {
   margin: 0 8px
@@ -58,10 +94,9 @@ body {
 .btn {
   border-radius: 4px;
   box-shadow: 0px 4px 4px rgba(0,0,0,0.25);
-  padding: 4px;
+  padding: 8px;
   cursor: pointer;
-  text-transform: uppercase;
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  text-transform: uppercase
 }
 .btn-disabled {
   color: rgb(100,100,100);
@@ -73,10 +108,14 @@ body {
   text-decoration: underline;
   cursor: pointer;
 }
+.list-item {
+  box-shadow: -2px 2px 4px rgba(0,0,0,0.15);
+  margin-bottom: 8px;
+  border-radius: 2px;
+}
 
 /* text */
 .title {
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   font-size: 18px;
-  cursor: default;
+  cursor: default
 }

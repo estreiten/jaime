@@ -58,6 +58,11 @@ const loginScript = () => {
   }
 }
 
+const logout = () => {
+  localStorage.removeItem('token')
+  location.reload()
+}
+
 const updateEnv = async (env, status) => {
   if (status === -1) {
     setTimeout(() => {location.reload()}, 2000)
