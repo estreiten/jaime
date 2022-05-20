@@ -10,7 +10,7 @@ module.exports = {
       const status =  hasLogs ? env.logs[0].status : 0;
       const lastRun = hasLogs ? parseInt(env.logs[0].date) : null;
       html += `<div class="flex pa-8 ${status > 0 ? 'status-error' : 'status-ok'}">
-                <div class="align-self-start pr-8 ${status === 0 ? 'text-ok' : 'text-error'}">${status === 0 ? 'Active' : 'Inactive'}</div>
+                <div class="align-self-start pr-8 ${status === 0 ? 'text-ok' : 'text-error'}">${status === 0 ? 'Active' : 'Failed'}</div>
                 <div class="flex flex-max justify-spaceAround align-center">
                   <div>${env.name.toUpperCase()}</div>
                   <div>${!!lastRun ?
