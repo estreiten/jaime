@@ -75,6 +75,6 @@ const updateEnv = async (env, status) => {
 const showLog = async (env, log, status) => {
   const logTxt = await request(`/log?env=${env}&date=${log}`, 'get')
   document.querySelector('main').innerHTML = `
-    <h2 class="${status > 0 ? 'status-error' : 'status-ok'} pa-4">${new Date(log).toLocaleDateString()} ${new Date(log).toLocaleTimeString()}</h2>
+    <h2 class="${status > 0 ? 'status-error' : 'status-ok'} pa-4">${new Date(log).toLocaleDateString()} ${new Date(log).toLocaleTimeString()} on ${env.toUpperCase()}</h2>
     <pre><code>${logTxt}</code></pre>`
 }
