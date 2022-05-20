@@ -48,6 +48,22 @@ When triggered manually, the scripts will receive one parameter:
  1. the path of the output log
   It won't receive the updated branch here, since the update won't imply any branch change.
 
+### Custom actions
+To specify custom actions in the app, you have to create a special folder at the root of the project called ``actions``.<br>
+The actions are buttons in the board, with the action name inside them, that will trigger a specific script file.<br>
+For example, in the `config.js` file:
+
+    actions: [
+      {
+        name: 'Play music',
+        script: 'play.sh'
+      }
+    ]
+
+  when clicking the "Play music" button, it will trigger the ``play.sh`` script located inside the ``actions`` folder in the root of the project.
+  
+
 ### Coming next
 - Generic envs: create a specific folder for scripts to run on every environment, adding the env name as parameter.
 - Board visual improvements
+- Actions: show output/logs, specify the script root
