@@ -83,3 +83,4 @@ It will be enough for Jaime to include the bots' environments in its board, disp
 - Generic envs: create a specific folder for scripts to run on every environment, adding the env name as parameter.
 - Board visual improvements.
 - Actions: show output/logs, specify the script root.
+- Optional tokens + password generator on installation step.
