@@ -1,7 +1,22 @@
 const fs = require('fs');
 const { spawnSync } = require("child_process");
+const botManager = require('./bot.js');
 const util = require('./utils.js');
 const environments = require('./config').env;
+
+const getEnvironments = async () => {
+  let envs = []
+  for (const envName in environments) {
+    if (Object.hasOwnProperty.call(environments, envName)) {
+      let env = environments[envName];
+      env.name = envName
+      env.logs = getEnvLogs(envName)
+      envs.push(env)
+    }
+  }
+  const botEnvs = await botManager.getEnvironments()
+  return envs.concat(botEnvs)
+}
 
 const getEnvByName = (name) => {
   for (const envName in environments) {
@@ -16,15 +31,13 @@ const getEnvByName = (name) => {
   return false
 }
 
-const getEnvByBranch = (branch) => {
-  for (const envName in environments) {
-    if (Object.hasOwnProperty.call(environments, envName)) {
-      let env = environments[envName];
-      const hasBranch = env.branchStart ? branch.startsWith(env.branch) : branch === env.branch
-      if (hasBranch) {
-        env.name = envName
-        return env
-      }
+const getEnvByBranch = async (branch) => {
+  const envs = await getEnvironments()
+  for (let index = 0; index < envs.length; index++) {
+    const env = envs[index];
+    const hasBranch = env.branchStart ? branch.startsWith(env.branch) : branch === env.branch
+    if (hasBranch) {
+      return env
     }
   }
   return false
@@ -103,25 +116,18 @@ const getEnvLogs = (envName) => {
 }
 
 module.exports = {
+  getEnvironments,
   updateByEnvName: (envName) => {
     const env = getEnvByName(envName)
     return update(env)
   },
-  updateByBranch: (branch) => {
-    const env = getEnvByBranch(branch)
-    return update(env, branch)
-  },
-  getEnvironments: () => {
-    let envs = []
-    for (const envName in environments) {
-      if (Object.hasOwnProperty.call(environments, envName)) {
-        let env = environments[envName];
-        env.name = envName
-        env.logs = getEnvLogs(envName)
-        envs.push(env)
-      }
+  updateByBranch: async (branch) => {
+    const env = await getEnvByBranch(branch)
+    if (env.bot !== null) {
+      botManager.updateEnv(env.bot, env.name, branch)
+    } else {
+      update(env, branch)
     }
-    return envs
   },
   getLogPath: (env, date) => {
     const logsPath = `${__dirname}/env/${env}/logs`

@@ -1,8 +1,8 @@
 const envManager = require('./env.js');
 
 module.exports = {
-  draw: () => {
-    const environments = envManager.getEnvironments()
+  draw: async () => {
+    const environments = await envManager.getEnvironments()
     let html = '<div class="flex-column list-item">'
     for (let index = 0; index < environments.length; index++) {
       const env = environments[index];
@@ -14,12 +14,12 @@ module.exports = {
                 <div class="flex flex-max justify-spaceAround align-center">
                   <div>${env.name.toUpperCase()}</div>
                   <div>${!!lastRun ?
-                    `Last update: <span class="link" onclick="showLog('${env.name}', ${lastRun}, ${status})">${new Date(lastRun).toLocaleDateString()} ${new Date(lastRun).toLocaleTimeString()}</span>` :
+                    `Last update: <span class="link" onclick="showLog('${env.name}', ${lastRun}, ${status}${env.bot  !== undefined ? ', ' + env.bot : ''})">${new Date(lastRun).toLocaleDateString()} ${new Date(lastRun).toLocaleTimeString()}</span>` :
                     'Not updated yet'}
                   </div>
                   <div
                     class="btn white-blue ${status === -1 ? 'btn-disabled' : ''}"
-                    onclick="updateEnv('${env.name}', ${status})">${status === -1 ? 'Running' : 'Update'}
+                    onclick="updateEnv('${env.name}', ${status}${env.bot  !== undefined ? ', ' + env.bot : ''})">${status === -1 ? 'Running' : 'Update'}
                   </div>
                 </div>
               </div>`

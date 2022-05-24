@@ -63,17 +63,22 @@ const logout = () => {
   location.reload()
 }
 
-const updateEnv = async (env, status) => {
+const updateEnv = async (env, status, bot) => {
   if (status === -1) {
     setTimeout(() => {location.reload()}, 2000)
   } else {
-    await request('/update','post',{env})
+    const params = bot !== undefined ? {env, bot} : {env}
+    await request('/update','post', params)
     location.reload()
   }
 }
 
-const showLog = async (env, log, status) => {
-  const logTxt = await request(`/log?env=${env}&date=${log}`, 'get')
+const showLog = async (env, log, status, bot) => {
+  let path = `/log?env=${env}&date=${log}`
+  if (bot !== undefined) {
+    path += `&bot=${bot}`
+  }
+  const logTxt = await request(path, 'get')
   document.querySelector('main').innerHTML = `
     <h2 class="${status > 0 ? 'status-error' : 'status-ok'} pa-4">${new Date(log).toLocaleDateString()} ${new Date(log).toLocaleTimeString()} on ${env.toUpperCase()}</h2>
     <pre><code>${logTxt}</code></pre>`

@@ -1,3 +1,4 @@
+### Installation
 1. Install dependencies with ``npm install``
 2. Copy `config.example.js` to `config.js`
 3. Replace by the corresponding values in `config.js`.<br>
@@ -8,7 +9,7 @@
       qa: {
         branch: 'release-',
         branchStart: true,
-        path: '/home/i78s-qa'
+        path: '/home/project-qa'
       }
     }
     ```
@@ -62,8 +63,23 @@ For example, in the `config.js` file:
 
   when clicking the "Play music" button, it will trigger the ``play.sh`` script located inside the ``actions`` folder in the root of the project.
   
+### Bots: run tasks in remote workstations
+If you need to run tasks in a remote computer, install a [Jaime Bot](https://github.com/estreiten/jaime-bot) there.
+Then create a new key in the `config.js` file following the next convention:
+
+    bots: [
+      {
+        host: 'bot-url-or-ip',
+        port: bot_port
+        token: 'bot_long_token_string'
+      }
+    ]
+
+The remote bot should be running on the specified host:port and have the same token on its config file.<br>
+It will be enough for Jaime to include the bots' environments in its board, display the logs and trigger manual or push-hook updates for them.
 
 ### Coming next
+- Support for HTTPS, both Jaime and bots.
 - Generic envs: create a specific folder for scripts to run on every environment, adding the env name as parameter.
-- Board visual improvements
-- Actions: show output/logs, specify the script root
+- Board visual improvements.
+- Actions: show output/logs, specify the script root.
