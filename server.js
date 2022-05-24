@@ -3,6 +3,7 @@ const hookListener = require('./push-hook.js');
 const authService = require('./auth.js');
 const envManager = require('./env.js');
 const botManager = require('./bot.js');
+const actionManager = require('./action.js');
 const board = require('./board.js');
 
 const express = require('express');
@@ -100,6 +101,32 @@ app.get('/log', async (req, res) => {
       }
     } else {
       res.sendStatus(403)
+    }
+  } catch (err) {
+    console.error(err.message)
+    res.sendStatus(500)
+  }
+})
+
+app.post('/action', async (req, res) => {
+  try {
+    console.log('action trigger received for', req.body.name)
+    if (authorized(req)) {
+      if (!!req.body.name) {
+        if (req.body.bot === undefined) {
+          if (config.actions.some(action => action.name === req.body.name)) {
+            res.sendStatus(actionManager.execute(req.body.name) === 0 ? 200 : 500)
+          } else {
+            res.sendStatus(400)
+          }
+        } else {
+          return botManager.executeAction(req.body.bot, req.body.name)
+        }
+      } else {
+        res.sendStatus(400)
+      }
+    } else {
+      res.redirect('/')
     }
   } catch (err) {
     console.error(err.message)

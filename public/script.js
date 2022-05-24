@@ -83,3 +83,8 @@ const showLog = async (env, log, status, bot) => {
     <h2 class="${status > 0 ? 'status-error' : 'status-ok'} pa-4">${new Date(log).toLocaleDateString()} ${new Date(log).toLocaleTimeString()} on ${env.toUpperCase()}</h2>
     <pre><code>${logTxt}</code></pre>`
 }
+
+const triggerAction = async (action, bot) => {
+  const params = bot !== null ? {name: action, bot} : {name: action}
+  await request('/action','post', params)
+}

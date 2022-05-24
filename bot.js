@@ -1,5 +1,37 @@
 const util = require('./utils.js')
 const config = require('./config.js').bots
+let botsInfo = null
+
+const getInfo = async () => {
+  let info = { envs: [], actions: []}
+  for (let index = 0; index < config.length; index++) {
+    const botConfig = config[index];
+    resp = await util.request({
+      hostname: botConfig.host,
+      port: botConfig.port,
+      path: `/?token=${botConfig.token}`,
+      method: 'GET',
+    })
+    const botInfo = JSON.parse(resp)
+    if (botInfo.env.length > 0) {
+      const botEnvs = botInfo.env.map(env => {
+        env.bot = index
+        return env
+      })
+      info.envs = info.envs.concat(botEnvs)
+    }
+    if (botInfo.actions.length > 0) {
+      const botActions = botInfo.actions.map(action => {
+        return {
+          name: action,
+          bot: index
+        }
+      })
+      info.actions = info.actions.concat(botActions)
+    }
+  }
+  return info
+}
 
 module.exports = {
   getConfig: (botIndex) => {
@@ -10,22 +42,16 @@ module.exports = {
     }
   },
   getEnvironments: async () => {
-    let envs = []
-    for (let index = 0; index < config.length; index++) {
-      const botConfig = config[index];
-      let botEnvs = await util.request({
-        hostname: botConfig.host,
-        port: botConfig.port,
-        path: `/?token=${botConfig.token}`,
-        method: 'GET',
-      })
-      botEnvs = JSON.parse(botEnvs).map(env => {
-        env.bot = index
-        return env
-      })
-      envs = envs.concat(botEnvs)
+    if (botsInfo === null) {
+      botsInfo = await getInfo()
     }
-    return envs
+    return botsInfo.envs
+  },
+  getActions: async () => {
+    if (botsInfo === null) {
+      botsInfo = await getInfo()
+    }
+    return botsInfo.actions
   },
   getLog: (botIndex, envName, date) => {
     if (botIndex < config.length) {
@@ -53,6 +79,20 @@ module.exports = {
         path: `/update?token=${botConfig.token}`,
         method: 'POST',
         data
+      })
+    } else {
+      return null
+    }
+  },
+  executeAction: (botIndex, actionName) => {
+    if (botIndex < config.length) {
+      const botConfig = config[botIndex]
+      return util.request({
+        hostname: botConfig.host,
+        port: botConfig.port,
+        path: `/action?token=${botConfig.token}`,
+        method: 'POST',
+        data: { name: actionName }
       })
     } else {
       return null

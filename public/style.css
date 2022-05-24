@@ -50,6 +50,12 @@ body {
 .pr-8 {
   padding-right: 24px
 }
+.mx-4 {
+  margin: 0 16px
+}
+.mt-8 {
+  margin-top: 24px
+}
 .v-separator {
   height: inherit;
   width: 1px;

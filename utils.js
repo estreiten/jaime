@@ -32,7 +32,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       let out = []
       const req = http.request(options, res => {
-        console.log(`Request ${options.hostname}${options.path}: ${res.statusCode}`);
+        console.log(`Request ${options.hostname}:${options.port}${options.path}: ${res.statusCode}`);
 
         res.on('data', chunk => {
           out.push(chunk);
