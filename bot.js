@@ -47,15 +47,11 @@ module.exports = {
     }
   },
   getEnvironments: async () => {
-    if (botsInfo === null) {
-      botsInfo = await getInfo()
-    }
+    botsInfo = await getInfo()
     return botsInfo.envs
   },
   getActions: async () => {
-    if (botsInfo === null) {
-      botsInfo = await getInfo()
-    }
+    botsInfo = await getInfo()
     return botsInfo.actions
   },
   getLog: (botIndex, envName, date) => {

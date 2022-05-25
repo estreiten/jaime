@@ -64,13 +64,9 @@ const logout = () => {
 }
 
 const updateEnv = async (env, status, bot) => {
-  if (status === -1) {
-    setTimeout(() => {location.reload()}, 2000)
-  } else {
-    const params = bot !== undefined ? {env, bot} : {env}
-    await request('/update','post', params)
-    location.reload()
-  }
+  const params = bot !== undefined ? {env, bot} : {env}
+  request('/update','post', params)
+  location.reload()
 }
 
 const showLog = async (env, log, status, bot) => {

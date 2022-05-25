@@ -5,11 +5,15 @@ module.exports = {
   draw: async () => {
     const environments = await envManager.getEnvironments()
     const actions = await actionManager.getActions()
+    let running = false
     let html = '<h2 class="mt-8">ENVIRONMENTS</h2>'
     for (let index = 0; index < environments.length; index++) {
       const env = environments[index];
       const hasLogs = !!env.logs && env.logs.length > 0
       const status =  hasLogs ? env.logs[0].status : 0;
+      if (status === -1) {
+        running = true
+      }
       const lastRun = hasLogs ? parseInt(env.logs[0].date) : null;
       html += `<div class="flex-column mx-4 list-item">
                 <div class="flex pa-8 ${status > 0 ? 'status-error' : 'status-ok'}" >
@@ -37,6 +41,9 @@ module.exports = {
                 </div>`
     }
     html += '</div>'
+    if (running) {
+      html += '<script>setTimeout(() => {location.reload()}, 2000)</script>'
+    }
     return html
   }
 }
