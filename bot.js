@@ -5,30 +5,32 @@ let botsInfo = null
 const getInfo = async () => {
   let info = { envs: [], actions: []}
   try {
-    for (let index = 0; index < config.length; index++) {
-      const botConfig = config[index];
-      resp = await util.request({
-        hostname: botConfig.host,
-        port: botConfig.port,
-        path: `/?token=${botConfig.token}`,
-        method: 'GET',
-      })
-      const botInfo = JSON.parse(resp)
-      if (botInfo.env.length > 0) {
-        const botEnvs = botInfo.env.map(env => {
-          env.bot = index
-          return env
+    if (config) {
+      for (let index = 0; index < config.length; index++) {
+        const botConfig = config[index];
+        resp = await util.request({
+          hostname: botConfig.host,
+          port: botConfig.port,
+          path: `/?token=${botConfig.token}`,
+          method: 'GET',
         })
-        info.envs = info.envs.concat(botEnvs)
-      }
-      if (botInfo.actions.length > 0) {
-        const botActions = botInfo.actions.map(action => {
-          return {
-            name: action,
-            bot: index
-          }
-        })
-        info.actions = info.actions.concat(botActions)
+        const botInfo = JSON.parse(resp)
+        if (botInfo.env.length > 0) {
+          const botEnvs = botInfo.env.map(env => {
+            env.bot = index
+            return env
+          })
+          info.envs = info.envs.concat(botEnvs)
+        }
+        if (botInfo.actions.length > 0) {
+          const botActions = botInfo.actions.map(action => {
+            return {
+              name: action,
+              bot: index
+            }
+          })
+          info.actions = info.actions.concat(botActions)
+        }
       }
     }
   } catch (error) {
