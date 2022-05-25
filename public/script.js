@@ -63,10 +63,23 @@ const logout = () => {
   location.reload()
 }
 
-const updateEnv = async (env, status, bot) => {
-  const params = bot !== undefined ? {env, bot} : {env}
-  request('/update','post', params)
-  location.reload()
+const updateEnv = async (el , env, bot) => {
+  const itemEl = el.closest('.list-item')
+  const statusEl = itemEl.firstElementChild
+  if (!statusEl.classList.contains('status-running')) {
+    statusEl.classList.remove('status-ok', 'status-error')
+    statusEl.classList.add('status-running')
+    const statusTxt = statusEl.firstElementChild
+    statusTxt.classList.remove('text-ok', 'text-error')
+    statusTxt.classList.add('text-running')
+    statusTxt.innerHTML = 'Running'
+    el.classList.add('btn-disabled')
+    el.innerHTML = 'Running'
+    const params = bot !== undefined ? {env, bot} : {env}
+    request('/update','post', params).then(() => {
+      location.reload()
+    })
+  }
 }
 
 const showLog = async (env, log, status, bot) => {

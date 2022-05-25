@@ -74,11 +74,17 @@ body {
 .status-error {
   background-color: rgb(250,200,200)
 }
+.status-running {
+  background-color: rgb(200,200,255);
+}
 .text-ok {
   color: rgb(150, 200, 150)
 }
 .text-error {
   color: rgb(200, 150, 150)
+}
+.text-running {
+  color: rgb(150, 150, 200)
 }
 
 /* elements */
