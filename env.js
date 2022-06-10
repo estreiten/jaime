@@ -61,7 +61,7 @@ const runScript = (step, {env, branch, logName, lock}, next) => {
       log(logFile, `The ${env.name} environment ${name} process ${code === 0 ? 'succeded' : 'failed'}`)
       if (code === 0) {
         if (next && next.length > 0) {
-          runScript(next.shift(), {env, branch, logFile}, next)
+          runScript(next.shift(), {env, branch, logFile, lock}, next)
         } else {
           log(logFile, `===== The ${env.name} environment has been updated =====`)
         }
