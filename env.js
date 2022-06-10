@@ -108,7 +108,7 @@ const update = (env, branch, tries = 3) => {
       }
     } else {
       fs.closeSync(fs.openSync(lock, 'w'))
-      const logName = `${__dirname}/env/${env.name}/logs/${(new Date()).getTime()}`
+      const logName = `${path}/logs/${(new Date()).getTime()}`
       runScript('update', {env, branch, logName, lock}, ['build','post'])
     }
   } else {
