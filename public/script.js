@@ -77,7 +77,7 @@ const updateEnv = async (el , env, bot) => {
     el.innerHTML = 'Running'
     const params = bot !== undefined ? {env, bot} : {env}
     request('/update','post', params).then(() => {
-      location.reload()
+      setTimeout(() => { location.reload() }, 1000 * 60 * 1)
     })
   }
 }

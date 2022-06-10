@@ -16,9 +16,7 @@ module.exports = {
         console.log('post received')
         if (req.body.ref.startsWith('refs/heads/')) {
           const branch = req.body.ref.substring(11)
-          console.log(`${branch} branch update detected`)
-          await envManager.updateByBranch(branch)
-          console.log(`${branch} branch processing finished`)
+          envManager.updateByBranch(branch)
           console.log(util.formatDate(new Date()))
         }
         res.sendStatus(200)

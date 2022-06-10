@@ -67,7 +67,8 @@ app.post('/update', async (req, res) => {
       if (!!req.body.env) {
         if (req.body.bot === undefined) {
           if (Object.keys(config.env).indexOf(req.body.env) > -1) {
-            res.sendStatus(envManager.updateByEnvName(req.body.env) === 0 ? 200 : 500)
+            envManager.updateByEnvName(req.body.env)
+            res.sendStatus(200)
           } else {
             res.sendStatus(400)
           }

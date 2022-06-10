@@ -5,12 +5,16 @@ module.exports = {
   draw: async () => {
     const environments = await envManager.getEnvironments()
     const actions = await actionManager.getActions()
+    let isRunning = false
     let html = '<h2 class="mt-8">ENVIRONMENTS</h2>'
     for (let index = 0; index < environments.length; index++) {
       const env = environments[index];
       const hasLogs = !!env.logs && env.logs.length > 0
-      const status =  hasLogs ? env.logs[0].status : 0;
-      const lastRun = hasLogs ? parseInt(env.logs[0].date) : null;
+      const status =  hasLogs ? env.logs[0].status : 0
+      if (status === -1) {
+        isRunning = true
+      }
+      const lastRun = hasLogs ? parseInt(env.logs[0].date) : null
       html += `<div class="flex-column mx-4 list-item">
                 <div class="flex pa-8 ${status > 0 ? 'status-error' : status == 0 ? 'status-ok' : 'status-running'}" >
                   <div class="align-self-start pr-8 ${status > 0 ? 'text-error' : status == 0 ? 'text-ok' : 'text-running'}">
@@ -39,6 +43,9 @@ module.exports = {
                 </div>`
     }
     html += '</div>'
+    if (isRunning) {
+      html += '<script>setTimeout(location.reload, 1000 * 60 * 5)</script>'
+    }
     return html
   }
 }
