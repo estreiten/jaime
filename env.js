@@ -43,7 +43,7 @@ const getEnvByBranch = async (branch) => {
   return false
 }
 
-const runScript = (step, {env, branch, logName}, next) => {
+const runScript = (step, {env, branch, logName, lock}, next) => {
   const name = step === 'post' ? 'post-build' : step
   const scriptFile = step === 'update' ? `${__dirname}/update.sh` : `${__dirname}/env/${env.name}/${step}.sh`
   const logFile = `${logName}.log`
@@ -72,14 +72,17 @@ const runScript = (step, {env, branch, logName}, next) => {
       if (branch) {
         console.log(`${branch} branch processing finished`)
       }
+      fs.unlinkSync(lock)
     })
     process.on('error', err => {
       log(logFile, `error ${err.name}: ${err.message}`)
       fs.renameSync(logFile, `${logName}-1.log`)
+      fs.unlinkSync(lock)
     })
   } else {
     log(logFile, `No ${env.name} environment ${name} script was found`)
     fs.renameSync(logFile, `${logName}-0.log`)
+    fs.unlinkSync(lock)
   }
 }
 
@@ -106,7 +109,7 @@ const update = (env, branch, tries = 3) => {
     } else {
       fs.closeSync(fs.openSync(lock, 'w'))
       const logName = `${__dirname}/env/${env.name}/logs/${(new Date()).getTime()}`
-      runScript('update', {env, branch, logName}, ['build','post'])
+      runScript('update', {env, branch, logName, lock}, ['build','post'])
     }
   } else {
     console.log(`No environment is connected to the ${branch} branch`)
