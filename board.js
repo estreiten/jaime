@@ -39,7 +39,7 @@ module.exports = {
       const action = actions[index];
       html += `<div
                   class="btn white-blue mx-4"
-                  onclick="triggerAction('${action.name}', ${action.bot})">${action.name}
+                  onclick="triggerAction('${action.key}', ${action.bot})">${action.name}
                 </div>`
     }
     html += '</div>'

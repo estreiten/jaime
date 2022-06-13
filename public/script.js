@@ -93,7 +93,7 @@ const showLog = async (env, log, status, bot) => {
     <pre><code>${logTxt}</code></pre>`
 }
 
-const triggerAction = async (action, bot) => {
-  const params = bot !== null ? {name: action, bot} : {name: action}
+const triggerAction = async (actionKey, bot) => {
+  const params = bot !== null ? {key: actionKey, bot} : {key: actionKey}
   await request('/action','post', params)
 }

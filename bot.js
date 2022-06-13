@@ -25,7 +25,8 @@ const getInfo = async () => {
         if (botInfo.actions.length > 0) {
           const botActions = botInfo.actions.map(action => {
             return {
-              name: action,
+              name: action.name,
+              key: action.key,
               bot: index
             }
           })
@@ -87,7 +88,7 @@ module.exports = {
       return null
     }
   },
-  executeAction: (botIndex, actionName) => {
+  executeAction: (botIndex, actionKey) => {
     if (botIndex < config.length) {
       const botConfig = config[botIndex]
       return util.request({
@@ -95,7 +96,7 @@ module.exports = {
         port: botConfig.port,
         path: `/action?token=${botConfig.token}`,
         method: 'POST',
-        data: { name: actionName }
+        data: { key: actionKey }
       })
     } else {
       return null
