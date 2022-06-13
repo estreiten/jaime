@@ -61,7 +61,8 @@ For example, in the `config.js` file:
       }
     ]
 
-  when clicking the "Play music" button in the Jaime Manager board, it will trigger the ``run.sh`` script located inside the ``actions/play`` folder. The output will be displayed in a new file inside the ``logs`` folder.
+  when clicking the "Play music" button in the Jaime Manager board, it will trigger the ``run.sh`` script located inside the ``actions/play`` folder. The output will be displayed in a new file inside the ``logs`` folder.<br>
+  Optional: you can also specify the ``root`` option in the action config. The action script will run in the folder specified by that property.
   
 ### Bots: run tasks in remote workstations
 If you need to run tasks in a remote computer, install a [Jaime Bot](https://github.com/estreiten/jaime-bot) there.
@@ -87,5 +88,4 @@ If present and a new env/action is triggered, it tries again after 10 minutes. I
 - Support for HTTPS, both Jaime and bots.
 - Generic envs: create a specific folder for scripts to run on every environment, adding the env name as parameter.
 - Board visual improvements.
-- Actions: show output/logs, specify the script root.
 - Optional tokens + password generator on installation step.
