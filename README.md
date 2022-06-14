@@ -86,6 +86,8 @@ If present and a new env/action is triggered, it tries again after 10 minutes. I
 
 
 ### Coming next
+- List all previous update/action logs.
+- Send email notifications after update/action.
 - Support for HTTPS, both Jaime and bots.
 - Generic envs: create a specific folder for scripts to run on every environment, adding the env name as parameter.
 - Board visual improvements.
