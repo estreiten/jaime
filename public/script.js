@@ -23,6 +23,7 @@ const request = (url, method, data) => {
         if (view === 'login') {
           loginScript()
         }
+        parseDates()
       } else {
         return response.text()
       }
@@ -31,6 +32,22 @@ const request = (url, method, data) => {
   .catch((error) => {
     console.error('Error:', error);
   });
+}
+
+const parseDates = () => {
+  const dates = document.getElementsByClassName('date')
+  for (let index = 0; index < dates.length; index++) {
+    const date = dates[index];
+    date.innerHTML = new Date(parseInt(date.innerHTML)).toLocaleString(undefined, {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric'
+    })
+  }
 }
 
 const loginScript = () => {

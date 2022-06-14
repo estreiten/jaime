@@ -23,7 +23,7 @@ module.exports = {
                   <div class="flex flex-max justify-spaceAround align-center">
                     <div>${env.name.toUpperCase()}</div>
                     <div>${!!lastRun && (status > -1) ?
-                      `Last update: <span class="link" onclick="showLog('env', '${env.name}', ${lastRun}, ${status}${env.bot  !== undefined ? ', ' + env.bot : ''})">${new Date(lastRun).toLocaleDateString()} ${new Date(lastRun).toLocaleTimeString()}</span>` :
+                      `Last update: <span class="link date" onclick="showLog('env', '${env.name}', ${lastRun}, ${status}${env.bot  !== undefined ? ', ' + env.bot : ''})">${lastRun}</span>` :
                       'Not updated yet'}
                     </div>
                     <div
@@ -51,7 +51,7 @@ module.exports = {
                       onclick="triggerAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">${action.name.toUpperCase()}
                     </div>
                     <div class="action-status">${status === -1 ? 'Running' :
-                      !!lastRun ? `Last run: <span class="link" onclick="showLog('action', '${action.key}', ${lastRun}, ${status}${action.bot  !== undefined && action.bot !== null ? ', ' + action.bot : ''})">${new Date(lastRun).toLocaleDateString()} ${new Date(lastRun).toLocaleTimeString()}</span>` :
+                      !!lastRun ? `Last run: <span class="link date" onclick="showLog('action', '${action.key}', ${lastRun}, ${status}${action.bot  !== undefined && action.bot !== null ? ', ' + action.bot : ''})">${lastRun}</span>` :
                       'Not run yet'}
                     </div>
                   </div>
