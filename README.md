@@ -62,6 +62,7 @@ For example, in the `config.js` file:
     ]
 
   when clicking the "Play music" button in the Jaime Manager board, it will trigger the ``run.sh`` script located inside the ``actions/play`` folder. The output will be displayed in a new file inside the ``logs`` folder.<br>
+  Note: make sure that the script files have the corresponding permissions to be executed by Jaime.<br>
   Optional: you can also specify the ``root`` option in the action config. The action script will run in the folder specified by that property.
   
 ### Bots: run tasks in remote workstations
