@@ -107,7 +107,7 @@ const showLog = async (type, key, log, status, bot) => {
   const logTxt = await request(path, 'get')
   document.querySelector('main').innerHTML = `
     <h2 class="${status > 0 ? 'status-error' : 'status-ok'} pa-4">
-      <span class="date">${log}</span> on ${key.toUpperCase()}</h2>
+      <span class="date">${log}</span> ${type === 'env' ? 'on' : 'by'} "${key.toUpperCase()}"</h2>
     <pre><code>${logTxt}</code></pre>`
   parseDates()
 }
