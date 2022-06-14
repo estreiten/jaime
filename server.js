@@ -73,7 +73,8 @@ app.post('/update', async (req, res) => {
             res.sendStatus(400)
           }
         } else {
-          return botManager.updateEnv(req.body.bot, req.body.env)
+          const status = await botManager.updateEnv(req.body.bot, req.body.env)
+          res.sendStatus(status)
         }
       } else {
         res.sendStatus(400)
@@ -90,12 +91,17 @@ app.post('/update', async (req, res) => {
 app.get('/log', async (req, res) => {
   try {
     if (authorized(req)) {
-      if (!!req.query.env && !!req.query.date) {
+      if ((!!req.query.env || !!req.query.action) && !!req.query.date) {
         if (req.query.bot !== undefined) {
-          const log = await botManager.getLog(req.query.bot, req.query.env, req.query.date)
+          const type = !!req.query.env ? 'env' : 'action'
+          const key = type === 'env' ? req.query.env : req.query.action
+          const log = await botManager.getLog(req.query.bot, key, req.query.date, type)
           res.send(log)
         } else {
-          res.sendFile(envManager.getLogPath(req.query.env, req.query.date, !!req.query.bot ? req.query.bot : null), {root: '.'})
+          const manager = !!req.query.env ? envManager : actionManager
+          const key = !!req.query.env ? req.query.env : req.query.action
+          const path = manager.getLogPath(key, req.query.date)
+          res.sendFile(path, {root: '.'})
         }
       } else {
         res.sendStatus(400)
@@ -122,7 +128,8 @@ app.post('/action', async (req, res) => {
             res.sendStatus(400)
           }
         } else {
-          return botManager.executeAction(req.body.bot, req.body.key)
+          const status = await botManager.executeAction(req.body.bot, req.body.key)
+          res.sendStatus(status)
         }
       } else {
         res.sendStatus(400)

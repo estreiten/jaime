@@ -131,3 +131,8 @@ body {
   font-size: 18px;
   cursor: default
 }
+
+/* Specifics */
+.action-status {
+  margin: 0 16px
+}

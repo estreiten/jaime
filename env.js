@@ -1,4 +1,5 @@
 const fs = require('fs');
+const os = require('os');
 const { spawn } = require("child_process");
 const botManager = require('./bot.js');
 const util = require('./utils.js');
@@ -50,7 +51,12 @@ const runScript = (step, {env, branch, logName, lock}, next) => {
   const params = branch ? [branch, logFile] : [logFile]
   if (fs.existsSync(scriptFile)) {
     log(logFile, `===== ${env.name} environment ${name} started =====`)
-    const process = spawn(scriptFile, params, {cwd: env.path})
+    const isWin = os.platform() === "win32"
+    const spawnParams = isWin ? { shell: true } : {}
+    if (env.path) {
+      spawnParams.cwd = env.path
+    }
+    const process = spawn(scriptFile, params, spawnParams)
     process.stdout.on('data', data => {
       log(logFile, data)
     })

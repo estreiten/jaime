@@ -82,18 +82,29 @@ const updateEnv = async (el , env, bot) => {
   }
 }
 
-const showLog = async (env, log, status, bot) => {
-  let path = `/log?env=${env}&date=${log}`
+const showLog = async (type, key, log, status, bot) => {
+  let path = `/log?${type}=${key}&date=${log}`
   if (bot !== undefined) {
     path += `&bot=${bot}`
   }
   const logTxt = await request(path, 'get')
   document.querySelector('main').innerHTML = `
-    <h2 class="${status > 0 ? 'status-error' : 'status-ok'} pa-4">${new Date(log).toLocaleDateString()} ${new Date(log).toLocaleTimeString()} on ${env.toUpperCase()}</h2>
+    <h2 class="${status > 0 ? 'status-error' : 'status-ok'} pa-4">${new Date(log).toLocaleDateString()} ${new Date(log).toLocaleTimeString()} on ${key.toUpperCase()}</h2>
     <pre><code>${logTxt}</code></pre>`
 }
 
-const triggerAction = async (actionKey, bot) => {
-  const params = bot !== null ? {key: actionKey, bot} : {key: actionKey}
-  await request('/action','post', params)
+const triggerAction = async (el, actionKey, bot) => {
+   const itemEl = el.closest('.list-item')
+   const statusEl = itemEl.firstElementChild
+   if (!statusEl.classList.contains('status-running')) {
+    statusEl.classList.remove('status-ok', 'status-error')
+    statusEl.classList.add('status-running')
+    el.classList.add('btn-disabled')
+    const lastEl = itemEl.getElementsByClassName('action-status')[0]
+    lastEl.innerHTML = 'Running'
+    const params = bot !== null ? {key: actionKey, bot} : {key: actionKey}
+    request('/action','post', params).then(() => {
+      setTimeout(() => { location.reload() }, 1000 * 60 * 1)
+    })
+  }
 }
