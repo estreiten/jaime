@@ -27,6 +27,7 @@ const getInfo = async () => {
             return {
               name: action.name,
               key: action.key,
+              logs: action.logs,
               bot: index
             }
           })
@@ -57,49 +58,63 @@ module.exports = {
     botsInfo = await getInfo()
     return botsInfo.actions
   },
-  getLog: (botIndex, envName, date) => {
+  getLog: (botIndex, key, date, type) => {
     if (botIndex < config.length) {
       const botConfig = config[botIndex]
       return util.request({
         hostname: botConfig.host,
         port: botConfig.port,
-        path: `/log?token=${botConfig.token}&env=${envName}&date=${date}`,
+        path: `/log?token=${botConfig.token}&${type}=${key}&date=${date}`,
         method: 'GET',
       })
     } else {
       return null
     }
   },
-  updateEnv: (botIndex, envName, branch) => {
-    if (botIndex < config.length) {
-      const botConfig = config[botIndex]
-      let data = { env: envName }
-      if (!!branch) {
-        data.branch = branch
+  updateEnv: async (botIndex, envName, branch) => {
+    return new Promise((resolve) => {
+      if (botIndex < config.length) {
+        const botConfig = config[botIndex]
+        let data = { env: envName }
+        if (!!branch) {
+          data.branch = branch
+        }
+        const req = util.request({
+          hostname: botConfig.host,
+          port: botConfig.port,
+          path: `/update?token=${botConfig.token}`,
+          method: 'POST',
+          data
+        })
+        req.then(() => { resolve(200) })
+          .catch((err) => {
+            console.error(err)
+            resolve(500)
+          })
+      } else {
+        resolve(200)
       }
-      return util.request({
-        hostname: botConfig.host,
-        port: botConfig.port,
-        path: `/update?token=${botConfig.token}`,
-        method: 'POST',
-        data
-      })
-    } else {
-      return null
-    }
+    })
   },
-  executeAction: (botIndex, actionKey) => {
-    if (botIndex < config.length) {
-      const botConfig = config[botIndex]
-      return util.request({
-        hostname: botConfig.host,
-        port: botConfig.port,
-        path: `/action?token=${botConfig.token}`,
-        method: 'POST',
-        data: { key: actionKey }
-      })
-    } else {
-      return null
-    }
+  executeAction: async (botIndex, actionKey) => {
+    return new Promise((resolve) => {
+      if (botIndex < config.length) {
+        const botConfig = config[botIndex]
+        const req = util.request({
+          hostname: botConfig.host,
+          port: botConfig.port,
+          path: `/action?token=${botConfig.token}`,
+          method: 'POST',
+          data: { key: actionKey }
+        })
+        req.then(() => { resolve(200) })
+          .catch((err) => {
+            console.error(err)
+            resolve(500)
+          })
+      } else {
+        resolve(200)
+      }
+    })
   }
 }

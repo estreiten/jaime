@@ -1,4 +1,5 @@
 const fs = require('fs');
+const os = require('os');
 const { spawn } = require("child_process");
 const actions = require('./config').actions;
 const botManager = require('./bot.js');
@@ -18,7 +19,13 @@ const runScript = (action, path) => {
   const logName = `${path}/logs/${(new Date()).getTime()}`
   const logFile = `${logName}.log`
   if (fs.existsSync(scriptFile)) {
-    const process = spawn(scriptFile, { cwd: action.root })
+    log(logFile, `The "${action.name}" action script is starting`)
+    const isWin = os.platform() === "win32"
+    const spawnParams = isWin ? { shell: true } : {}
+    if (action.root) {
+      spawnParams.cwd = action.root
+    }
+    const process = spawn(scriptFile, spawnParams)
     process.stdout.on('data', data => {
       log(logFile, data)
     })
@@ -64,17 +71,40 @@ const execute = (actionKey, tries = 3) => {
   }
 }
 
+const getLogs = (actionKey) => {
+  let logs = []
+  const logsPath = `${__dirname}/actions/${actionKey}/logs`
+  const logFiles = fs.readdirSync(logsPath)
+  for (let index = 0; index < logFiles.length; index++) {
+    const logFile = logFiles[index];
+    const separator = logFile.indexOf('-');
+    const ext = logFile.indexOf('.log');
+    logs.push({
+      date: separator > -1 ? logFile.substring(0, separator) : logFile.substring(0, ext),
+      status: separator > -1 ? logFile.substring(separator + 1, ext) : -1
+    })
+  }
+  return logs.sort((logA, logB) => logB.date - logA.date)
+}
+
 module.exports = {
   getActions: async () => {
     const myActions = actions ? actions.map(action => {
       return {
         name: action.name,
         key: action.key,
+        logs: getLogs(action.key),
         bot: null
       }
     }) : []
     const botActions = await botManager.getActions()
     return myActions.length > 0 ? myActions.concat(botActions) : botActions
   },
-  execute
+  execute,
+  getLogPath: (actionKey, date) => {
+    const logsPath = `${__dirname}/actions/${actionKey}/logs`
+    const logFiles = fs.readdirSync(logsPath)
+    const logFile = logFiles.find(logFile => logFile.startsWith(date))
+    return `actions/${actionKey}/logs/${logFile}`
+  }
 }

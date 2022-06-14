@@ -23,12 +23,12 @@ module.exports = {
                   <div class="flex flex-max justify-spaceAround align-center">
                     <div>${env.name.toUpperCase()}</div>
                     <div>${!!lastRun && (status > -1) ?
-                      `Last update: <span class="link" onclick="showLog('${env.name}', ${lastRun}, ${status}${env.bot  !== undefined ? ', ' + env.bot : ''})">${new Date(lastRun).toLocaleDateString()} ${new Date(lastRun).toLocaleTimeString()}</span>` :
+                      `Last update: <span class="link" onclick="showLog('env', '${env.name}', ${lastRun}, ${status}${env.bot  !== undefined ? ', ' + env.bot : ''})">${new Date(lastRun).toLocaleDateString()} ${new Date(lastRun).toLocaleTimeString()}</span>` :
                       'Not updated yet'}
                     </div>
                     <div
                       class="btn white-blue ${status === -1 ? 'btn-disabled' : ''}"
-                      onclick="updateEnv(this, '${env.name}', ${env.bot  !== undefined ? ', ' + env.bot : ''})">${status === -1 ? 'Running' : 'Update'}
+                      onclick="updateEnv(this, '${env.name}'${env.bot  !== undefined ? ', ' + env.bot : ''})">${status === -1 ? 'Running' : 'Update'}
                     </div>
                   </div>
                 </div>
@@ -37,10 +37,26 @@ module.exports = {
     html += '<h2 class="mt-8">ACTIONS</h2><div class="flex">'
     for (let index = 0; index < actions.length; index++) {
       const action = actions[index];
-      html += `<div
-                  class="btn white-blue mx-4"
-                  onclick="triggerAction('${action.key}', ${action.bot})">${action.name}
-                </div>`
+      const hasLogs = !!action.logs && action.logs.length > 0
+      const status = hasLogs ? action.logs[0].status : 0
+      if (status === -1) {
+        isRunning = true
+      }
+      const lastRun = hasLogs ? parseInt(action.logs[0].date) : null
+      html += `<div class="flex-column mx-4 list-item">
+                <div class="flex pa-8 ${status > 0 ? 'status-error' : status == 0 ? 'status-ok' : 'status-running'}" >
+                  <div class="flex flex-max justify-spaceAround align-center">
+                    <div
+                      class="btn white-blue ${status === -1 ? 'btn-disabled' : ''}"
+                      onclick="triggerAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">${action.name.toUpperCase()}
+                    </div>
+                    <div class="action-status">${status === -1 ? 'Running' :
+                      !!lastRun ? `Last run: <span class="link" onclick="showLog('action', '${action.key}', ${lastRun}, ${status}${action.bot  !== undefined && action.bot !== null ? ', ' + action.bot : ''})">${new Date(lastRun).toLocaleDateString()} ${new Date(lastRun).toLocaleTimeString()}</span>` :
+                      'Not run yet'}
+                    </div>
+                  </div>
+                </div>
+              </div>`
     }
     html += '</div>'
     if (isRunning) {
