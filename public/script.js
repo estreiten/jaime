@@ -106,8 +106,10 @@ const showLog = async (type, key, log, status, bot) => {
   }
   const logTxt = await request(path, 'get')
   document.querySelector('main').innerHTML = `
-    <h2 class="${status > 0 ? 'status-error' : 'status-ok'} pa-4">${new Date(log).toLocaleDateString()} ${new Date(log).toLocaleTimeString()} on ${key.toUpperCase()}</h2>
+    <h2 class="${status > 0 ? 'status-error' : 'status-ok'} pa-4">
+      <span class="date">${log}</span> on ${key.toUpperCase()}</h2>
     <pre><code>${logTxt}</code></pre>`
+  parseDates()
 }
 
 const triggerAction = async (el, actionKey, bot) => {
