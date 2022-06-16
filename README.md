@@ -1,3 +1,5 @@
+Jaime is a free CI and automation tool to build and test your hosted software projects.
+
 ### Installation
 1. Install dependencies with ``npm install``
 2. Copy `config.example.js` to `config.js`
@@ -89,6 +91,7 @@ If present and a new env/action is triggered, it tries again after 10 minutes. I
 - List all previous update/action logs.
 - Send email notifications after update/action.
 - Support for HTTPS, both Jaime and bots.
+- Add environments and actions from the Board.
 - Generic envs: create a specific folder for scripts to run on every environment, adding the env name as parameter.
 - Board visual improvements.
 - Optional tokens + password generator on installation step.

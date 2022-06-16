@@ -1,7 +1,7 @@
 {
   "name": "jaime",
   "version": "1.0.0",
-  "description": "A useful helper to build environments and run scripts",
+  "description": "Free CI and automation tool to build and test your hosted software projects",
   "main": "server.js",
   "author": "Ezequiel Streitenberger <ezequiel@estreiten.com>",
   "repository": {
