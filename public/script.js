@@ -21,7 +21,10 @@ const request = (url, method, data) => {
       if (view) {
         document.querySelector('main').innerHTML = await response.text()
         if (view === 'login') {
+          toggleMenuActions(false)
           loginScript()
+        } else {
+          toggleMenuActions(true)
         }
         parseDates()
       } else {
@@ -32,6 +35,18 @@ const request = (url, method, data) => {
   .catch((error) => {
     console.error('Error:', error);
   });
+}
+
+const toggleMenuActions = (show) => {
+  const menuActions = document.querySelectorAll('.top-menu .btn, .top-menu .v-separator');
+  for (let index = 0; index < menuActions.length; index++) {
+    const action = menuActions[index];
+    if (show) {
+      action.classList.remove('hidden')
+    } else {
+      action.classList.add('hidden')
+    }
+  }
 }
 
 const parseDates = () => {

@@ -1,5 +1,7 @@
-<form id="loginForm" method="post" action="/login">
-  <input type="password" name="pass">
-  <input type="submit" value="Login">
-</form>
-<div id="passError" class="error-txt">Password is not valid</div>
+<div class="flex flex-column align-center pa-4" style="margin-top: 240px">
+  <form id="loginForm" method="post" action="/login">
+    <input type="password" name="pass" class="input-text">
+    <input type="submit" value="Login" class="btn white-blue">
+  </form>
+  <div id="passError" class="text-error mt-8 mx-4">Password is not valid</div>
+</div>

@@ -125,11 +125,20 @@ body {
   margin-bottom: 8px;
   border-radius: 2px;
 }
+.input-text {
+  height: 24px;
+  padding: 4px
+}
 
 /* text */
 .title {
   font-size: 18px;
   cursor: default
+}
+
+/* state */
+.hidden {
+  display: none;
 }
 
 /* Specifics */
