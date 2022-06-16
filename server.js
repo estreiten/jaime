@@ -1,3 +1,4 @@
+const cron = require('node-cron');
 const config = require('./config');
 const hookListener = require('./push-hook.js');
 const authService = require('./auth.js');
@@ -148,3 +149,13 @@ app.listen(port, () => {
   console.log(`Jaime listening on ${port}`)
   hookListener.init()
 })
+
+//schedule actions with "cron" property
+const cronActions = config.actions.filter(action => !!action.cron)
+console.log('actions', cronActions)
+for (let index = 0; index < cronActions.length; index++) {
+  const action = cronActions[index];
+  cron.schedule(action.cron, () => {
+    actionManager.execute(action.key, 0)  //don't retry if locked
+  });
+}

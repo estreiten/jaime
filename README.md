@@ -1,6 +1,6 @@
 Jaime is a free CI and automation tool to build and test your hosted software projects.
 
-### Installation
+## Installation
 1. Install dependencies with ``npm install``
 2. Copy `config.example.js` to `config.js`
 3. Replace by the corresponding values in `config.js`.<br>
@@ -43,13 +43,15 @@ Jaime is a free CI and automation tool to build and test your hosted software pr
 
 --------------
 
-### Script parameters
+## Script parameters
 When triggered by a Github push hook, the scripts will receive two parameters:
  1. the name of the branch updated
  2. the path of the output log
 When triggered manually, the scripts will receive one parameter:
  1. the path of the output log
   It won't receive the updated branch here, since the update won't imply any branch change.
+
+## Custom actions
 
 To specify custom actions in the app, you have to create a special folder at the root of the project called ``actions``.<br>
 The actions are buttons in the Jaime Manager board, with the action name inside them, that will trigger a specific script file.<br>
@@ -66,8 +68,12 @@ For example, in the `config.js` file:
   when clicking the "Play music" button in the Jaime Manager board, it will trigger the ``run.sh`` script located inside the ``actions/play`` folder. The output will be displayed in a new file inside the ``logs`` folder.<br>
   Note: make sure that the script files have the corresponding permissions to be executed by Jaime.<br>
   Optional: you can also specify the ``root`` option in the action config. The action script will run in the folder specified by that property.
+### Scheduled actions
+You can tell Jaime to run actions automatically following a specified schedule.<br>
+Just set the ``cron`` property in the action config following the [node-cron convention](https://github.com/node-cron/node-cron).<br>
+For example: ``cron: '*/2 * * *'`` to run every two hours.
   
-### Bots: run tasks in remote workstations
+## Bots: run tasks in remote workstations
 If you need to run tasks in a remote computer, install a [Jaime Bot](https://github.com/estreiten/jaime-bot) there.
 Then create a new key in the `config.js` file following the next convention:
 
@@ -82,12 +88,12 @@ Then create a new key in the `config.js` file following the next convention:
 The remote bot should be running on the specified host:port and have the same token on its config file.<br>
 It will be enough for Jaime to include the bots' environments in its board, display the logs and trigger manual or push-hook updates for them.
 
-### Internal arch for the curious mind
+## Internal arch for the curious mind
 - To avoid multiple instances of the same env/action being run, we create a ".lock" file inside the env/action folder. 
 If present and a new env/action is triggered, it tries again after 10 minutes. If the file is still present, it keeps trying until the 30 minute breach is reached. Then it just stops trying to execute.
 
 
-### Coming next
+## Coming next
 - List all previous update/action logs.
 - Send email notifications after update/action.
 - Support for HTTPS, both Jaime and bots.
