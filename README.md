@@ -43,6 +43,19 @@ Jaime is a free CI and automation tool to build and test your hosted software pr
 
 --------------
 
+## Environment update triggers
+An environment update can be triggered manually from the board with the Update button or by a Github push hook.<br>
+Jaime comes with a pre-built Github push hook listener to trigger new updates. You only need to specify this property in the `config.js` file:
+
+  ```
+  hook: {
+    port: 4000
+  }
+  ```
+where ``port`` is the one used by the [Github hook](https://docs.github.com/en/developers/webhooks-and-events/webhooks/about-webhooks).
+
+You can disable automatic update of environments when a new Github push hook is triggered by setting the ``auto: false`` property in the env config.
+
 ## Script parameters
 When triggered by a Github push hook, the scripts will receive two parameters:
  1. the name of the branch updated

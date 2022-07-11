@@ -37,7 +37,7 @@ const getEnvByBranch = async (branch) => {
   for (let index = 0; index < envs.length; index++) {
     const env = envs[index];
     const hasBranch = env.branchStart ? branch.startsWith(env.branch) : branch === env.branch
-    if (hasBranch) {
+    if (hasBranch && env.auto !== false) {
       return env
     }
   }
