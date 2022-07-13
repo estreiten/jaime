@@ -44,7 +44,7 @@ module.exports = {
       }
       const lastRun = hasLogs ? parseInt(action.logs[0].date) : null
       html += `<div class="flex-column mx-4 list-item">
-                <div class="flex pa-8 ${status > 0 ? 'status-error' : status == 0 ? 'status-ok' : 'status-running'}" >
+                <div class="flex pa-8 flex-max ${status > 0 ? 'status-error' : status == 0 ? 'status-ok' : 'status-running'}" >
                   <div class="flex flex-max justify-spaceAround align-center">
                     <div
                       class="btn white-blue ${status === -1 ? 'btn-disabled' : ''}"
@@ -53,8 +53,18 @@ module.exports = {
                     <div class="action-status">${status === -1 ? 'Running' :
                       !!lastRun ? `Last run: <span class="link date" onclick="showLog('action', '${action.key}', ${lastRun}, ${status}${action.bot  !== undefined && action.bot !== null ? ', ' + action.bot : ''})">${lastRun}</span>` :
                       'Not run yet'}
-                    </div>
-                  </div>
+                    </div>`
+
+      if (!!action.cron) {
+        html +=`    <div class="action-schedule">
+                      <a href="https://github.com/node-cron/node-cron#allowed-fields" target="_blank">Schedule</a>: ${action.cron}
+                      <div
+                        class="btn icon white-blue ${status === -1 ? 'btn-disabled' : ''}"
+                        onclick="toggleAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">${action.isPaused ? '▶' : '&#10074;&#10074;'}</div>
+                    </div>`
+      }
+
+      html += `   </div>
                 </div>
               </div>`
     }

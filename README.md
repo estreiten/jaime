@@ -81,10 +81,13 @@ For example, in the `config.js` file:
   when clicking the "Play music" button in the Jaime Manager board, it will trigger the ``run.sh`` script located inside the ``actions/play`` folder. The output will be displayed in a new file inside the ``logs`` folder.<br>
   Note: make sure that the script files have the corresponding permissions to be executed by Jaime.<br>
   Optional: you can also specify the ``root`` option in the action config. The action script will run in the folder specified by that property.
+
 ### Scheduled actions
 You can tell Jaime to run actions automatically following a specified schedule.<br>
-Just set the ``cron`` property in the action config following the [node-cron convention](https://github.com/node-cron/node-cron).<br>
-For example: ``cron: '*/2 * * *'`` to run every two hours.
+Just set the ``cron`` property in the action config following the [node-cron convention](https://github.com/node-cron/node-cron#allowed-fields).<br>
+For example: ``cron: '*/2 * * *'`` to run every two hours or ``cron: '50 * * * *'`` to run every hour at 50 minutes (1:50, 2:50, etc).<br><br>
+You can pause/resume the scheduler for that specific action with the corresponding play/pause button of the board.<br>
+A paused action will have a ``.pause`` file inside its folder to notify the scheduler.
   
 ## Bots: run tasks in remote workstations
 If you need to run tasks in a remote computer, install a [Jaime Bot](https://github.com/estreiten/jaime-bot) there.

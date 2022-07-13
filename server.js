@@ -1,4 +1,3 @@
-const cron = require('node-cron');
 const config = require('./config');
 const hookListener = require('./push-hook.js');
 const authService = require('./auth.js');
@@ -144,18 +143,37 @@ app.post('/action', async (req, res) => {
   }
 })
 
+app.post('/toggle', async (req, res) => {
+  try {
+    console.log('toggle action received for', req.body.key)
+    if (authorized(req)) {
+      if (!!req.body.key) {
+        if (req.body.bot === undefined) {
+          if (config.actions.some(action => action.key === req.body.key && !!action.cron)) {
+            actionManager.toggle(req.body.key)
+            res.sendStatus(200)
+          } else {
+            res.sendStatus(400)
+          }
+        } else {
+          const status = await botManager.toggleAction(req.body.bot, req.body.key)
+          res.sendStatus(status)
+        }
+      } else {
+        res.sendStatus(400)
+      }
+    } else {
+      res.redirect('/')
+    }
+  } catch (err) {
+    console.error(err.message)
+    res.sendStatus(500)
+  }
+})
+
 const port = config.port || 80
 app.listen(port, () => {
   console.log(`Jaime listening on ${port}`)
+  actionManager.initScheduler()
   hookListener.init()
 })
-
-//schedule actions with "cron" property
-const cronActions = config.actions.filter(action => !!action.cron)
-console.log('actions', cronActions)
-for (let index = 0; index < cronActions.length; index++) {
-  const action = cronActions[index];
-  cron.schedule(action.cron, () => {
-    actionManager.execute(action.key, 0)  //don't retry if locked
-  });
-}

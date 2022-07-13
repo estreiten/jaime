@@ -142,3 +142,10 @@ const triggerAction = async (el, actionKey, bot) => {
     })
   }
 }
+
+const toggleAction = async (el, actionKey, bot) => {
+  const params = bot !== null ? {key: actionKey, bot} : {key: actionKey}
+  request('/toggle','post', params).then(() => {
+    el.innerHTML = el.innerHTML === '▶' ? '&#10074;&#10074;' : '▶'
+  })
+}

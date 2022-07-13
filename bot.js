@@ -24,12 +24,17 @@ const getInfo = async () => {
         }
         if (botInfo.actions.length > 0) {
           const botActions = botInfo.actions.map(action => {
-            return {
+            let out = {
               name: action.name,
               key: action.key,
               logs: action.logs,
+              cron: action.cron,
               bot: index
             }
+            if (!!action.cron) {
+              out.isPaused = action.isPaused
+            }
+            return out
           })
           info.actions = info.actions.concat(botActions)
         }
@@ -114,6 +119,48 @@ module.exports = {
           })
       } else {
         resolve(200)
+      }
+    })
+  },
+  toggleAction: async (botIndex, actionKey) => {
+    return new Promise((resolve) => {
+      if (botIndex < config.length) {
+        const botConfig = config[botIndex]
+        const req = util.request({
+          hostname: botConfig.host,
+          port: botConfig.port,
+          path: `/toggle?token=${botConfig.token}`,
+          method: 'POST',
+          data: { key: actionKey }
+        })
+        req.then(() => { resolve(200) })
+          .catch((err) => {
+            console.error(err)
+            resolve(500)
+          })
+      } else {
+        resolve(200)
+      }
+    })
+  },
+  isActionPaused: async (botIndex, actionKey) => {
+    return new Promise((resolve) => {
+      if (botIndex < config.length) {
+        const botConfig = config[botIndex]
+        const req = util.request({
+          hostname: botConfig.host,
+          port: botConfig.port,
+          path: `/paused?token=${botConfig.token}`,
+          method: 'GET',
+          data: { key: actionKey }
+        })
+        req.then(resolve)
+          .catch((err) => {
+            console.error(err)
+            resolve(false)
+          })
+      } else {
+        resolve(false)
       }
     })
   }

@@ -1,9 +1,9 @@
 const fs = require('fs');
 const os = require('os');
 const { spawn } = require("child_process");
+const cron = require('node-cron');
 const actions = require('./config').actions;
 const botManager = require('./bot.js');
-const util = require('./utils.js');
 
 const log = (file, txt) => {
   let line = `${new Date().toUTCString()}  `
@@ -11,6 +11,24 @@ const log = (file, txt) => {
   fs.writeFileSync(file, line, {
     flag: 'a+'
   });
+}
+
+const getActions = async () => {
+  const myActions = actions ? actions.map(action => {
+    let out = {
+      name: action.name,
+      key: action.key,
+      logs: getLogs(action.key),
+      cron: action.cron,
+      bot: null,
+    }
+    if (!!action.cron) {
+      out.isPaused = isPaused(action.key)
+    }
+    return out
+  }) : []
+  const botActions = await botManager.getActions()
+  return myActions.length > 0 ? myActions.concat(botActions) : botActions
 }
 
 const runScript = (action, path) => {
@@ -71,6 +89,33 @@ const execute = (actionKey, tries = 3) => {
   }
 }
 
+const toggle = (actionKey) => {
+  const action = actions.find(action => action.key === actionKey)
+  if (action) {
+    const path = `${__dirname}/actions/${action.key}`
+    const pause = `${path}/.pause`
+    if (fs.existsSync(pause)) {
+      fs.unlinkSync(pause)
+    } else {
+      fs.closeSync(fs.openSync(pause, 'w'))
+    }
+  } else {
+    console.log(`No action found with the key "${actionKey}"`)
+  }
+}
+
+const isPaused = (actionKey) => {
+  const action = actions.find(action => action.key === actionKey)
+  if (action) {
+    const path = `${__dirname}/actions/${action.key}`
+    const pause = `${path}/.pause`
+    return fs.existsSync(pause)
+  } else {
+    console.log(`No action found with the key "${actionKey}"`)
+    return false
+  }
+}
+
 const getLogs = (actionKey) => {
   let logs = []
   const logsPath = `${__dirname}/actions/${actionKey}/logs`
@@ -88,23 +133,35 @@ const getLogs = (actionKey) => {
 }
 
 module.exports = {
-  getActions: async () => {
-    const myActions = actions ? actions.map(action => {
-      return {
-        name: action.name,
-        key: action.key,
-        logs: getLogs(action.key),
-        bot: null
-      }
-    }) : []
-    const botActions = await botManager.getActions()
-    return myActions.length > 0 ? myActions.concat(botActions) : botActions
-  },
+  getActions,
   execute,
+  toggle,
   getLogPath: (actionKey, date) => {
     const logsPath = `${__dirname}/actions/${actionKey}/logs`
     const logFiles = fs.readdirSync(logsPath)
     const logFile = logFiles.find(logFile => logFile.startsWith(date))
     return `actions/${actionKey}/logs/${logFile}`
+  },
+  isPaused,
+  initScheduler: async () => {
+    const actions = await getActions()
+    const cronActions = actions.filter(action => !!action.cron)
+    console.log('actions schedule', cronActions)
+    for (let index = 0; index < cronActions.length; index++) {
+      const action = cronActions[index];
+      cron.schedule(action.cron, () => {
+        if (action.bot !== null) {
+          botManager.isActionPaused(action.bot, action.key).then(isPaused => {
+            if (isPaused === 'false') {
+              botManager.executeAction(action.bot, action.key)
+            }
+          })
+        } else {
+          if (!isPaused(action.key)) {
+            execute(action.key, 0) //don't retry if locked
+          }
+        }
+      });
+    }
   }
 }
