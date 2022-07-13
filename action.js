@@ -53,7 +53,11 @@ const runScript = (action, path) => {
     process.on('close', code => {
       log(logFile, `==== The "${action.name}" action script ${code === 0 ? 'succeded' : 'failed'} ====`)
       fs.renameSync(logFile, `${logName}-${code === null ? 1 : code}.log`)
-      fs.unlinkSync(lock)
+      if (code === 10) {
+        runScript(action, path)
+      } else {
+        fs.unlinkSync(lock)
+      }
     })
     process.on('error', err => {
       log(logFile, `error ${err.name}: ${err.message}`)
@@ -153,7 +157,7 @@ module.exports = {
         if (action.bot !== null) {
           botManager.isActionPaused(action.bot, action.key).then(isPaused => {
             if (isPaused === 'false') {
-              botManager.executeAction(action.bot, action.key)
+              botManager.executeAction(action.bot, action.key, 0)
             }
           })
         } else {

@@ -88,6 +88,11 @@ Just set the ``cron`` property in the action config following the [node-cron con
 For example: ``cron: '*/2 * * *'`` to run every two hours or ``cron: '50 * * * *'`` to run every hour at 50 minutes (1:50, 2:50, etc).<br><br>
 You can pause/resume the scheduler for that specific action with the corresponding play/pause button of the board.<br>
 A paused action will have a ``.pause`` file inside its folder to notify the scheduler.
+
+### Recursive actions (Linux only)
+Under specific cases, you may need to invoke the same script again once it's finished.<br>
+For those special cases, Jaime recognizes an exit code of 10 as an instruction to "Run this action again".<br>
+So, if you need the script to run again, just add the ``exit 10`` line in your ``run.sh`` script.
   
 ## Bots: run tasks in remote workstations
 If you need to run tasks in a remote computer, install a [Jaime Bot](https://github.com/estreiten/jaime-bot) there.

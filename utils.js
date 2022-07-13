@@ -33,6 +33,9 @@ module.exports = {
       let out = []
       const req = http.request(options, res => {
         console.log(`Request ${options.hostname}:${options.port}${options.path}: ${res.statusCode}`);
+        if (params.data) {
+          console.log(`  Body: ${data}`)
+        }
 
         res.on('data', chunk => {
           out.push(chunk);

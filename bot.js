@@ -101,7 +101,7 @@ module.exports = {
       }
     })
   },
-  executeAction: async (botIndex, actionKey) => {
+  executeAction: async (botIndex, actionKey, retries) => {
     return new Promise((resolve) => {
       if (botIndex < config.length) {
         const botConfig = config[botIndex]
@@ -110,7 +110,7 @@ module.exports = {
           port: botConfig.port,
           path: `/action?token=${botConfig.token}`,
           method: 'POST',
-          data: { key: actionKey }
+          data: { key: actionKey, retries }
         })
         req.then(() => { resolve(200) })
           .catch((err) => {
