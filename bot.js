@@ -34,6 +34,9 @@ const getInfo = async () => {
             if (!!action.cron) {
               out.isPaused = action.isPaused
             }
+            if (!!botInfo.name) {
+              out.group = botInfo.name
+            }
             return out
           })
           info.actions = info.actions.concat(botActions)

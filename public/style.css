@@ -24,6 +24,9 @@ body {
   text-align: center;
   text-transform: uppercase;
 }
+.flex-wrap {
+  flex-wrap: wrap;
+}
 .justify-spaceAround {
   justify-content: space-around;
 }
@@ -39,22 +42,31 @@ body {
 
 /* space */
 .pa-8 {
-  padding: 24px
+  padding: 24px !important
 }
 .pa-4 {
-  padding: 16px
+  padding: 16px !important
 }
 .pa-2 {
-  padding: 8px
+  padding: 8px !important
 }
 .pr-8 {
-  padding-right: 24px
+  padding-right: 24px !important
+}
+.mx-2 {
+  margin: 0 8px
 }
 .mx-4 {
   margin: 0 16px
 }
+.mb-0 {
+  margin-bottom: 0 !important
+}
+.mb-4 {
+  margin-bottom: 16px !important
+}
 .mt-8 {
-  margin-top: 24px
+  margin-top: 24px !important
 }
 .v-separator {
   height: inherit;

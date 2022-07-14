@@ -82,6 +82,17 @@ For example, in the `config.js` file:
   Note: make sure that the script files have the corresponding permissions to be executed by Jaime.<br>
   Optional: you can also specify the ``root`` option in the action config. The action script will run in the folder specified by that property.
 
+### Action groups
+You can group actions by the system where they are hosted.<br>
+To do so, you only need to define the ``name`` property at the root of the config file. <br>
+For example:
+
+    module.exports = {
+      name: 'My Computer',
+      auth: ...
+      ...
+    }
+
 ### Scheduled actions
 You can tell Jaime to run actions automatically following a specified schedule.<br>
 Just set the ``cron`` property in the action config following the [node-cron convention](https://github.com/node-cron/node-cron#allowed-fields).<br>

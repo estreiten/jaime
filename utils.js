@@ -1,5 +1,30 @@
 const http = require('http');
 
+Object.defineProperty(Array.prototype, 'groupBy', {
+  value: function (prop) {
+    return this.reduce((group, elem) => {
+      group[elem[prop]] = group[elem[prop]] ? group[elem[prop]] : [];
+      group[elem[prop]].push(elem);
+      return group;
+    }, {})
+  }
+});
+
+Object.defineProperty(Object.prototype, 'undefinedFirst', {
+  value: function () {
+    let keys = Object.keys(this)
+    const undefIndex = keys.indexOf('undefined')
+    if (undefIndex > -1) {
+      keys.splice(undefIndex, 1)
+      keys.unshift('undefined')
+    }
+    return keys.reduce((accumulator, key) => {
+      accumulator[key] = this[key];
+      return accumulator;
+    }, {});
+  }
+});
+
 const num = (number) => {
   return number.toLocaleString('en-US', {
     minimumIntegerDigits: 2,

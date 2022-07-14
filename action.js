@@ -2,6 +2,7 @@ const fs = require('fs');
 const os = require('os');
 const { spawn } = require("child_process");
 const cron = require('node-cron');
+const serverName = require('./config').name;
 const actions = require('./config').actions;
 const botManager = require('./bot.js');
 
@@ -20,10 +21,13 @@ const getActions = async () => {
       key: action.key,
       logs: getLogs(action.key),
       cron: action.cron,
-      bot: null,
+      bot: null
     }
     if (!!action.cron) {
       out.isPaused = isPaused(action.key)
+    }
+    if (!!serverName) {
+      out.group = serverName
     }
     return out
   }) : []

@@ -5,6 +5,7 @@ module.exports = {
   draw: async () => {
     const environments = await envManager.getEnvironments()
     const actions = await actionManager.getActions()
+    const actionsByGroup = actions.groupBy('group').undefinedFirst()
     let isRunning = false
     let html = '<h2 class="mt-8">ENVIRONMENTS</h2>'
     for (let index = 0; index < environments.length; index++) {
@@ -34,39 +35,48 @@ module.exports = {
                 </div>
               </div>`
     }
-    html += '<h2 class="mt-8">ACTIONS</h2><div class="flex">'
-    for (let index = 0; index < actions.length; index++) {
-      const action = actions[index];
-      const hasLogs = !!action.logs && action.logs.length > 0
-      const status = hasLogs ? action.logs[0].status : 0
-      if (status === -1) {
-        isRunning = true
+    const hasUndefinedGroup = Object.keys(actionsByGroup)[0] === 'undefined'
+    html += `<h2 class="mt-8${!hasUndefinedGroup ? ' mb-0' : ''}">ACTIONS</h2><div class="flex-column mx-2">`
+    for (const group in actionsByGroup) {
+      const groupActions = actionsByGroup[group];
+      if (group !== 'undefined') {
+        html += `<h3>${group}</h3>`
       }
-      const lastRun = hasLogs ? parseInt(action.logs[0].date) : null
-      html += `<div class="flex-column mx-4 list-item">
-                <div class="flex pa-8 flex-max ${status > 0 ? 'status-error' : status == 0 ? 'status-ok' : 'status-running'}" >
-                  <div class="flex flex-max justify-spaceAround align-center">
-                    <div
-                      class="btn white-blue ${status === -1 ? 'btn-disabled' : ''}"
-                      onclick="triggerAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">${action.name.toUpperCase()}
+      html += '<div class="flex flex-wrap">'
+        for (let index = 0; index < groupActions.length; index++) {
+          const action = groupActions[index];
+          const hasLogs = !!action.logs && action.logs.length > 0
+          const status = hasLogs ? action.logs[0].status : 0
+          if (status === -1) {
+            isRunning = true
+          }
+          const lastRun = hasLogs ? parseInt(action.logs[0].date) : null
+          html += `<div class="flex-column mx-4 mb-4 list-item">
+                    <div class="flex pa-8 flex-max ${status > 0 ? 'status-error' : status == 0 ? 'status-ok' : 'status-running'}" >
+                      <div class="flex flex-max justify-spaceAround align-center">
+                        <div
+                          class="btn white-blue ${status === -1 ? 'btn-disabled' : ''}"
+                          onclick="triggerAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">${action.name.toUpperCase()}
+                        </div>
+                        <div class="action-status">${status === -1 ? 'Running' :
+                          !!lastRun ? `Last run: <span class="link date" onclick="showLog('action', '${action.key}', ${lastRun}, ${status}${action.bot  !== undefined && action.bot !== null ? ', ' + action.bot : ''})">${lastRun}</span>` :
+                          'Not run yet'}
+                        </div>`
+
+          if (!!action.cron) {
+            html +=`    <div class="action-schedule">
+                          <a href="https://github.com/node-cron/node-cron#allowed-fields" target="_blank">Schedule</a>: ${action.cron}
+                          <div
+                            class="btn icon white-blue ${status === -1 ? 'btn-disabled' : ''}"
+                            onclick="toggleAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">${action.isPaused ? '▶' : '&#10074;&#10074;'}</div>
+                        </div>`
+          }
+
+          html += `   </div>
                     </div>
-                    <div class="action-status">${status === -1 ? 'Running' :
-                      !!lastRun ? `Last run: <span class="link date" onclick="showLog('action', '${action.key}', ${lastRun}, ${status}${action.bot  !== undefined && action.bot !== null ? ', ' + action.bot : ''})">${lastRun}</span>` :
-                      'Not run yet'}
-                    </div>`
-
-      if (!!action.cron) {
-        html +=`    <div class="action-schedule">
-                      <a href="https://github.com/node-cron/node-cron#allowed-fields" target="_blank">Schedule</a>: ${action.cron}
-                      <div
-                        class="btn icon white-blue ${status === -1 ? 'btn-disabled' : ''}"
-                        onclick="toggleAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">${action.isPaused ? '▶' : '&#10074;&#10074;'}</div>
-                    </div>`
-      }
-
-      html += `   </div>
-                </div>
-              </div>`
+                  </div>`
+        }
+      html += '</div>'
     }
     html += '</div>'
     if (isRunning) {
