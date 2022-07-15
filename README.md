@@ -60,9 +60,10 @@ You can disable automatic update of environments when a new Github push hook is 
 When triggered by a Github push hook, the scripts will receive two parameters:
  1. the name of the branch updated
  2. the path of the output log
+
 When triggered manually, the scripts will receive one parameter:
- 1. the path of the output log
-  It won't receive the updated branch here, since the update won't imply any branch change.
+ 1. the path of the output log<br>
+It won't receive the updated branch here, since the update won't imply any branch change.
 
 ## Custom actions
 
