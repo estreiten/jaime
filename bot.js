@@ -79,6 +79,19 @@ module.exports = {
       return null
     }
   },
+  getLogList: (botIndex, key, type) => {
+    if (botIndex < config.length) {
+      const botConfig = config[botIndex]
+      return util.request({
+        hostname: botConfig.host,
+        port: botConfig.port,
+        path: `/logs?token=${botConfig.token}&${type}=${key}`,
+        method: 'GET',
+      })
+    } else {
+      return null
+    }
+  },
   updateEnv: async (botIndex, envName, branch) => {
     return new Promise((resolve) => {
       if (botIndex < config.length) {

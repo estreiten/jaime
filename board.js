@@ -23,9 +23,10 @@ module.exports = {
                   </div>
                   <div class="flex flex-max justify-spaceAround align-center">
                     <div>${env.name.toUpperCase()}</div>
-                    <div>${!!lastRun && (status > -1) ?
+                    <div class="text-center">${!!lastRun && (status > -1) ?
                       `Last update: <span class="link date" onclick="showLog('env', '${env.name}', ${lastRun}, ${status}${env.bot  !== undefined ? ', ' + env.bot : ''})">${lastRun}</span>` :
-                      'Not updated yet'}
+                      'Not updated yet'}<br>
+                      ${!!hasLogs ? `<span class="link" onclick="listLogs('env', '${env.name}'${env.bot  !== undefined && env.bot !== null ? ', ' + env.bot : ''})">Previous updates</span>` : ''}
                     </div>
                     <div
                       class="btn white-blue ${status === -1 ? 'btn-disabled' : ''}"
@@ -58,9 +59,10 @@ module.exports = {
                           class="btn white-blue ${status === -1 ? 'btn-disabled' : ''}"
                           onclick="triggerAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">${action.name.toUpperCase()}
                         </div>
-                        <div class="action-status">${status === -1 ? 'Running' :
+                        <div class="action-updates text-center"><div class="action-status">${status === -1 ? 'Running' :
                           !!lastRun ? `Last run: <span class="link date" onclick="showLog('action', '${action.key}', ${lastRun}, ${status}${action.bot  !== undefined && action.bot !== null ? ', ' + action.bot : ''})">${lastRun}</span>` :
-                          'Not run yet'}
+                          'Not run yet'}</div>
+                          ${!!hasLogs ? `<span class="link" onclick="listLogs('action', '${action.key}'${action.bot  !== undefined && action.bot !== null  ? ', ' + action.bot : ''})">Previous runs</span>` : ''}
                         </div>`
 
           if (!!action.cron) {

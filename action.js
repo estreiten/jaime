@@ -150,6 +150,11 @@ module.exports = {
     const logFile = logFiles.find(logFile => logFile.startsWith(date))
     return `actions/${actionKey}/logs/${logFile}`
   },
+  getLogList: (actionKey) => {
+    const logsPath = `${__dirname}/actions/${actionKey}/logs`
+    const logFiles = fs.readdirSync(logsPath)
+    return logFiles.map(logFile => logFile.substring(0, logFile.length-4))  //remove file extension
+  },
   isPaused,
   initScheduler: async () => {
     const actions = await getActions()

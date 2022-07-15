@@ -121,9 +121,44 @@ const showLog = async (type, key, log, status, bot) => {
   }
   const logTxt = await request(path, 'get')
   document.querySelector('main').innerHTML = `
+    <div class="link" onclick="listLogs('${type}', '${key}'${bot  !== undefined ? ', ' + bot : ''})">All ${type === 'env' ? 'Updates' : 'Runs'}</div>
     <h2 class="${status > 0 ? 'status-error' : 'status-ok'} pa-4">
       <span class="date">${log}</span> ${type === 'env' ? 'on' : 'by'} "${key.toUpperCase()}"</h2>
     <pre><code>${logTxt}</code></pre>`
+  parseDates()
+}
+
+const listLogs = async (type, key, bot) => {
+  let path = `/logs?${type}=${key}`
+  if (bot !== undefined) {
+    path += `&bot=${bot}`
+  }
+  const resp = await request(path, 'get')
+  const logs = JSON.parse(resp).sort().reverse()
+  let html = `
+    <h2 class="status-running pa-4">"${key.toUpperCase()}" ${type === 'env' ? 'Updates' : 'Runs'}</h2>
+    <div class="flex flex-column">`
+    for (let index = 0; index <logs.length; index++) {
+      const log = logs[index]
+      const logArray = log.split('-')
+      const date = logArray[0]
+      let status = ''
+      let statusCls = ''
+      switch (logArray[1]) {
+        case undefined: status = 'Running'; statusCls = 'status-running text-running'; break
+        case '0': status = 'Success'; statusCls = 'status-ok text-ok'; break
+        case '1': status = 'Fail'; statusCls = 'status-error text-error'; break
+        case '10': status = 'Re-run'; statusCls = 'status-ok text-ok'; break
+        default: status = 'Fail'; statusCls = 'status-error text-error'
+      }
+      
+      html += `<div class="flex align-center pa-2">
+        <div class="link date" onclick="showLog('${type}', '${key}', ${date}, ${logArray[1]}${bot  !== undefined ? ', ' + bot : ''})">${date}</div>
+        <div class="label ${statusCls}">${status}</div>
+      </div>`
+    }
+  html += '</div>'
+  document.querySelector('main').innerHTML = html
   parseDates()
 }
 

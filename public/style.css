@@ -50,6 +50,9 @@ body {
 .pa-2 {
   padding: 8px !important
 }
+.pa-1 {
+  padding: 4px !important
+}
 .pr-8 {
   padding-right: 24px !important
 }
@@ -145,11 +148,21 @@ body {
   height: 24px;
   padding: 4px
 }
+.label {
+  padding: 4px;
+  border-radius: 4px;
+  margin: 0 8px;
+  font-size: 14px
+}
 
 /* text */
 .title {
   font-size: 18px;
   cursor: default
+}
+.text-center {
+  text-align: center;
+  line-height: 1.5;
 }
 
 /* state */
@@ -158,7 +171,7 @@ body {
 }
 
 /* Specifics */
-.action-status {
+.action-updates {
   margin: 0 16px
 }
 .action-schedule {
