@@ -1,3 +1,4 @@
+const fs = require('fs');
 const config = require('./config');
 const hookListener = require('./push-hook.js');
 const authService = require('./auth.js');
@@ -20,7 +21,12 @@ const authorized = (req) => {
 
 app.get('/', async (req, res) => {
   try {
-    res.sendFile('index.html', {root: '.'})
+    const tab = !!config.brand && !!config.brand.tab ? config.brand.tab : 'Jaime'
+    const title = !!config.brand && !!config.brand.title ? config.brand.title : 'Jaime Task Manager'
+    let html = fs.readFileSync('index.html', 'utf8');
+    html = html.replace('{{tab}}', tab)
+    html = html.replace('{{title}}', title)
+    res.send(html)
   } catch (err) {
     console.error(err.message)
     res.sendStatus(500)

@@ -121,7 +121,18 @@ Then create a new key in the `config.js` file following the next convention:
 The remote bot should be running on the specified host:port and have the same token on its config file.<br>
 It will be enough for Jaime to include the bots' environments in its board, display the logs and trigger manual or push-hook updates for them.
 
-## Internal arch for the curious mind
+## Branding
+You have a couple of config properties to get rid of Jaime titles and use your own branding.<br>
+In the `config.js` file:
+
+    branding: [
+      {
+        tab: 'tab text',
+        title: 'board title'
+      }
+    ]
+
+## Internal architecture for the curious mind
 - To avoid multiple instances of the same env/action being run, we create a ".lock" file inside the env/action folder. 
 If present and a new env/action is triggered, it tries again after 10 minutes. If the file is still present, it keeps trying until the 30 minute breach is reached. Then it just stops trying to execute.
 
