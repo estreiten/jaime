@@ -3,7 +3,7 @@ Jaime is a free CI and automation tool to build and test your hosted software pr
 ## Installation
 1. Install dependencies with ``npm install``
 2. Copy `config.example.js` to `config.js`
-3. Replace by the corresponding values in `config.js`.<br>
+3. Replace by the corresponding values in `config.js`, removing the comment characters.<br>
   Your environments must be set in the `config.js` file following the convention in the next example:
 
     ```
