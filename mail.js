@@ -8,7 +8,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       transporter
         .sendMail(msg)
-        .then(async (info) => {
+        .then((info) => {
           if (smtpConfig.host === 'smtp.ethereal.email') {
             console.info('Message sent: %s', info.messageId);
             // Preview only available when sending through an Ethereal account
