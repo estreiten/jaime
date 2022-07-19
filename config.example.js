@@ -8,7 +8,8 @@ module.exports = {
     port: 4000  //optional
   },
   /*
-  smtp: {
+  publicHost: 'public_host', //only for mail notifications
+  smtp: {   //only for mail notifications
     host: 'mail.host',
     port: 587,
     auth: {

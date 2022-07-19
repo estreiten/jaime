@@ -121,6 +121,83 @@ Then create a new key in the `config.js` file following the next convention:
 The remote bot should be running on the specified host:port and have the same token on its config file.<br>
 It will be enough for Jaime to include the bots' environments in its board, display the logs and trigger manual or push-hook updates for them.
 
+## Notifications
+After every environment update or task run, you can send email notifications.<br>
+
+### Requisites
+- You need an email sever with SMTP output protocol. It must be set in the ``smtp`` property at the config root:
+
+    ```
+    smtp: {
+      host: 'mail.host',
+      port: 587,
+      auth: {
+        user: 'mail_user',
+        pass: 'mail_pass'
+      },
+      tls: {
+        rejectUnauthorized: false
+      }
+    }
+    ```
+
+- You must specify the ``publicHost`` property at the config root:
+
+    ```
+    publicHost: 'public_host'
+    ```
+
+  It will be used to generate a link to the Jaime board in the notification email body. In this example, it will point to `http://public_host`.
+
+### Configuration
+Just add the ``notify`` key to the corresponding environment/action. For example:
+
+    env: {
+      name: {
+        branch: 'branch-name',
+        path: '/project/path',
+        notify: {email: 'feedback@mail.com'}
+      }
+    }
+
+You can also set multiple destinations:
+
+    env: {
+      name: {
+        branch: 'branch-name',
+        path: '/project/path',
+        notify: [
+          {email: 'feedback@mail.com'},
+          {email: 'feedback2@mail.com'}
+        ]
+      }
+    }
+
+And you can send notifications only on failures or attach the output log to the mail's body:
+
+    env: {
+      name: {
+        branch: 'branch-name',
+        path: '/project/path',
+        notify: [
+          {
+            email: 'feedback@mail.com',
+            on: 'failure'
+          },
+          {
+            email: 'feedback2@mail.com',
+            on: 'success',
+            level: 'log'
+          }
+        ]
+      }
+    }
+
+In this example:
+- `feedback@mail.com` will receive emails only if the environment update fails.
+- `feedback2@mail.com` will receive emails only if the environment update succeeded and the output log will be included in the email.
+Note: if the `on` option isn't specified, the email is sent on every run/update independently of the end status.
+
 ## Branding
 You have a couple of config properties to get rid of Jaime titles and use your own branding.<br>
 In the `config.js` file:
@@ -138,7 +215,6 @@ If present and a new env/action is triggered, it tries again after 10 minutes. I
 
 
 ## Coming next
-- Send email notifications after update/action.
 - Support for HTTPS, both Jaime and bots.
 - Add environments and actions from the Board.
 - Generic envs: create a specific folder for scripts to run on every environment, adding the env name as parameter.
