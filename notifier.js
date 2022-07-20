@@ -19,6 +19,7 @@ const notify = async (subjects, status, data, logFile) => {
         const subject = status === 'ok' ? subjects.ok : subjects.fail
         const host = config.publicHost
         const port = config.port
+        const title = config.brand && config.brand.title ? config.brand.title : 'Jaime Board'
         let html = ''
         if (destination.level === 'log') {
           const log = fs.readFileSync(logFile, 'utf8')
@@ -27,9 +28,10 @@ const notify = async (subjects, status, data, logFile) => {
           html = 'You can see the output log and '
         }
         html += `previous runs in the <a href="http://${host}${port ? ':' + port : ''}" target="_blank">
-          ${config.brand && config.brand.title ? config.brand.title : 'Jaime Board'}</a>.`
+          ${title}</a>.`
 
         await mailService.send({
+          from: `${title} <${config.smtp.auth.user}>`,
           to: destination.mail,
           subject,
           html
