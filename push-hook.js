@@ -12,11 +12,13 @@ module.exports = {
 
     app.post('/', async (req, res) => {
       try {
-        console.log('\n' + util.formatDate(new Date()))
+        console.log(util.formatDate(new Date()))
         console.log('post received')
         if (req.body.ref.startsWith('refs/heads/')) {
           const branch = req.body.ref.substring(11)
+          console.log(`branch: ${branch}`)
           envManager.updateByBranch(branch)
+          console.log('branch processed')
           console.log(util.formatDate(new Date()))
         }
         res.sendStatus(200)
