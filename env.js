@@ -161,7 +161,7 @@ module.exports = {
   },
   updateByBranch: async (branch) => {
     const env = await getEnvByBranch(branch)
-    if (env.bot !== null) {
+    if (env.bot !== undefined && env.bot !== null) {
       botManager.updateEnv(env.bot, env.name, branch)
     } else {
       update(env, branch)
