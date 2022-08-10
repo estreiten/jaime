@@ -53,15 +53,18 @@ const parseDates = () => {
   const dates = document.getElementsByClassName('date')
   for (let index = 0; index < dates.length; index++) {
     const date = dates[index];
-    date.innerHTML = new Date(parseInt(date.innerHTML)).toLocaleString(undefined, {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      second: 'numeric'
-    })
+    if (!date.classList.contains('parsed')) {
+      date.innerHTML = new Date(parseInt(date.innerHTML)).toLocaleString(undefined, {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric'
+      })
+      date.classList.add('parsed')
+    }
   }
 }
 
@@ -123,6 +126,8 @@ const showLog = async (type, key, log, status, bot) => {
 }
 
 const listLogs = async (type, key, bot) => {
+  const dialogEl = document.getElementById('dialog')
+  dialogEl.style.display = 'flex'
   let path = `/logs?${type}=${key}`
   if (bot !== undefined) {
     path += `&bot=${bot}`
@@ -130,29 +135,21 @@ const listLogs = async (type, key, bot) => {
   const resp = await request(path, 'get')
   const logs = JSON.parse(resp).sort().reverse()
   let html = `
-    <h2 class="status-running pa-4">"${key.toUpperCase()}" ${type === 'env' ? 'Updates' : 'Runs'}</h2>
     <div class="flex flex-column">`
     for (let index = 0; index <logs.length; index++) {
       const log = logs[index]
       const logArray = log.split('-')
       const date = logArray[0]
-      let status = ''
-      let statusCls = ''
-      switch (logArray[1]) {
-        case undefined: status = 'Running'; statusCls = 'status-running text-running'; break
-        case '0': status = 'Success'; statusCls = 'status-ok text-ok'; break
-        case '1': status = 'Fail'; statusCls = 'status-error text-error'; break
-        case '10': status = 'Re-run'; statusCls = 'status-ok text-ok'; break
-        default: status = 'Fail'; statusCls = 'status-error text-error'
-      }
-      
-      html += `<div class="flex align-center pa-2">
-        <div class="link date" onclick="showLog('${type}', '${key}', ${date}, ${logArray[1]}${bot  !== undefined ? ', ' + bot : ''})">${date}</div>
-        <div class="label ${statusCls}">${status}</div>
-      </div>`
+      const logStatus = logArray[1] == 0 ? 'success' : logArray[1] > 0 ? 'error' : 'progress'
+      html += `<div 
+                class="sublist-item btn flex justify-spaceAround mx-4 my-2 item-${logStatus} ${index === 0 ? ' mb-8' : ''}"
+                onclick="showLog('${type}', '${key}', ${date}, ${logArray[1]}${bot  !== undefined ? ', ' + bot : ''})">
+                <div class="icon icon-${logStatus}">${logArray[1] == 0 ? '✔' : logArray[1] > 0 ? '✖' : '⌛'}</div>
+                <span class="date">${date}</span></div>`
     }
   html += '</div>'
-  document.querySelector('main').innerHTML = html
+  document.getElementById('dialog-content').innerHTML = html
+  document.getElementById('dialog-title').innerHTML = `"${key.toUpperCase()}" ${type === 'env' ? 'Updates' : 'Runs'}`
   parseDates()
 }
 
@@ -173,4 +170,11 @@ const toggleAction = async (el, actionKey, bot) => {
   request('/toggle','post', params).then(() => {
     el.innerHTML = el.innerHTML === '▶' ? '&#10074;&#10074;' : '▶'
   })
+}
+
+const closeDialog = (ev) => {
+  ev.preventDefault();
+  if (ev.target.id === 'dialog' || ev.target.classList.contains('modal-close')) {
+    document.getElementById('dialog').style.display = 'none'
+  }
 }

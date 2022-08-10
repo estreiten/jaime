@@ -58,13 +58,13 @@ body {
   scrollbar-color: var(--light-color) var(--gray-color);
 }
 
-#main::-webkit-scrollbar {
+#main::-webkit-scrollbar, .modal-content::-webkit-scrollbar {
   width: 12px;
 }
-#main::-webkit-scrollbar-track {
+#main::-webkit-scrollbar-track, .modal-content::-webkit-scrollbar-track {
   background: var(--gray-color);
 }
-#main::-webkit-scrollbar-thumb {
+#main::-webkit-scrollbar-thumb, .modal-content::-webkit-scrollbar-thumb {
   background: var(--light-color);
 }
 
@@ -321,6 +321,57 @@ input:focus {
   font-size: 15px;
   box-shadow: 1px 1px 4px;
   margin: 8px 0;
+}
+
+#dialog {
+  display: none
+}
+.cover {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0,0,0,0.6);
+  flex-direction: column;
+}
+.modal {
+  border-radius: 4px;
+  background-color: var(--bg-color);
+  z-index: 10;
+  margin: 32px;
+  min-width: 320px;
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 2*32px);
+  box-shadow: -2px 2px 4px var(--secondary-color), 2px 2px 4px var(--secondary-color);
+}
+.modal-bar {
+  flex: 0 0 28px;
+  padding: 8px;
+  background-color: var(--primary-color);
+  color: var(--txt-alt-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-title {
+  flex: 1 0 auto;
+  text-align: center;
+}
+.modal-close {
+  justify-self: flex-end;
+}
+.modal-content {
+  overflow-y: auto;
+  padding: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--light-color) var(--gray-color);
 }
 
 /* text */

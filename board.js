@@ -55,6 +55,19 @@ const environmentsHtml = async () => {
     return { html, isRunning }
 }
 
+const dialog = () => {
+  html = `<div id="dialog" class="cover" onclick="closeDialog(event)">
+            <div class="modal">
+              <div class="modal-bar">
+                <div id="dialog-title" class="modal-title">Title</div>
+                <div class="modal-close btn inline" onclick="closeDialog(event)">✖</div>
+              </div>
+              <div id="dialog-content" class="modal-content">Content</div>
+            </div>
+          </div>`
+  return html
+}
+
 module.exports = {
   draw: async () => {
     const actions = await actionManager.getActions()
@@ -107,7 +120,7 @@ module.exports = {
         }
       html += '</div>'
     }
-    html += '</div>'
+    html += '</div>' + dialog()
     if (isRunning) {
       html += '<script>setTimeout(location.reload, 1000 * 60 * 5)</script>'
     }
