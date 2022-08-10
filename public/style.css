@@ -55,17 +55,17 @@ body {
   overflow-y: auto;
   height: calc(100vh - 28px - (2*16px));
   scrollbar-width: thin;
-  scrollbar-color: var(--primary-color) var(--light-color);
+  scrollbar-color: var(--light-color) var(--gray-color);
 }
 
 #main::-webkit-scrollbar {
   width: 12px;
 }
 #main::-webkit-scrollbar-track {
-  background: var(--light-color);
+  background: var(--gray-color);
 }
 #main::-webkit-scrollbar-thumb {
-  background: var(--primary-color);
+  background: var(--light-color);
 }
 
 input {
