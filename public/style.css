@@ -1,11 +1,68 @@
+:root {
+  --primary-color: rgb(28,66,128);
+  --dark-color: rgb(17,40,77);
+  --light-color: rgb(84,130,204);
+  --gray-color: rgb(90,114,153);
+  --txt-alt-color: rgb(180,204,243);
+  --txt-color: var(--dark-color);
+  --bg-color: rgb(114,160,234);
+  --white-color: rgb(148,186,248);
+  --secondary-color: rgb(68,106,168);
+  --success-color: rgb(26,150,75);
+  --success-shadow: rgba(26,150,75, 0.7);
+  --success-light: rgb(107,227,155);
+  --success-light-shadow: rgba(107,227,155,0.6);
+  --success-dark: #116332;
+  --success-gray: rgb(79,168,114);
+  --error-color: rgb(143,38,0);
+  --error-shadow: rgba(143,38,0, 0.7);
+  --error-light: rgb(219,107,66);
+  --error-light-shadow: rgba(219,107,66,0.6);
+  --error-dark: #5C1800;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg)
+  }
+  to {
+    transform: rotate(180deg)
+  }
+}
+
+@keyframes gradient {
+  0% {
+		background-position: 0% 0%;
+	}
+	50% {
+		background-position: 0% -150%;
+	}
+	100% {
+		background-position: 0% -300%;
+	}
+}
+
 body {
   cursor: default;
   margin: 0;
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  background-color: var(--white-color);
 }
 
 #main {
   margin: 16px
+}
+
+input {
+  background-color: var(--bg-color);
+  color: var(--txt-color);
+  border-radius: 4px;
+  border: none;
+  box-shadow: 0px 2px 2px rgba(0,0,0,0.25);
+  font-size: 18px
+}
+input:focus {
+  outline: none
 }
 
 /* layouts */
@@ -39,6 +96,9 @@ body {
 .align-self-start {
   align-self: flex-start;
 }
+.full-width {
+  width: 100%
+}
 
 /* space */
 .pa-8 {
@@ -53,35 +113,78 @@ body {
 .pa-1 {
   padding: 4px !important
 }
+.pa-0 {
+  padding: 0 !important
+}
 .pr-8 {
   padding-right: 24px !important
 }
+.pl-0 {
+  padding-left: 0 !important;
+}
+.pl-2 {
+  padding-left: 8px !important
+}
+.pt-2 {
+  padding-top: 8px !important
+}
+.py-2.px-4 {
+  padding: 8px 16px !important
+}
+.ma-2 {
+  margin: 8px !important
+}
 .mx-2 {
-  margin: 0 8px
+  margin: 0 8px !important
 }
 .mx-4 {
-  margin: 0 16px
+  margin: 0 16px !important
+}
+.my-2 {
+  margin: 8px 0 !important
+}
+.my-4 {
+  margin: 16px 0 !important
+}
+.mt-4 {
+  margin-top: 16px !important
+}
+.mt-8 {
+  margin-top: 24px !important
 }
 .mb-0 {
   margin-bottom: 0 !important
 }
+.mb-2 {
+  margin-bottom: 8px !important
+}
 .mb-4 {
   margin-bottom: 16px !important
 }
-.mt-8 {
-  margin-top: 24px !important
+.mb-8 {
+  margin-bottom: 24px !important
+}
+.ml-2 {
+  margin-left: 8px !important
+}
+.mx-4.my-2 {
+  margin: 8px 16px !important
 }
 .v-separator {
   height: inherit;
   width: 1px;
   opacity: 0.5;
-  background-color: rgb(225,225,255)
+  background-color: var(--white-color)
 }
 
 /* colors */
-.white-blue {
-  color: rgb(225,225,255);
-  background-color: rgb(0,0,100);
+.primary {
+  color: var(--txt-alt-color);
+  background-color: var(--primary-color);
+}
+.secondary {
+  color: var(--txt-color);
+  background-color: var(--secondary-color);
 }
 .status-ok {
   background-color: rgb(200,250,200)
@@ -101,14 +204,41 @@ body {
 .text-running {
   color: rgb(150, 150, 200)
 }
+.item-success {
+  background-color: var(--success-light-shadow) !important;
+}
+.icon-success {
+  color: var(--success-dark)
+}
+.item-error {
+  background-color: var(--error-light-shadow) !important;
+}
+.icon-error {
+  color: var(--error-dark)
+}
+.icon-progress {
+  animation: rotate 2s infinite linear
+}
+.bg-success {
+  background: linear-gradient(var(--success-shadow) 20%, var(--bg-color) 100%) !important;
+}
+.bg-error {
+  background: linear-gradient(var(--error-shadow) 20%, var(--bg-color) 100%) !important;
+}
+.bg-progress {
+  background: linear-gradient(var(--bg-color) 35%, var(--white-color) 60%, var(--bg-color) 75%);
+  background-size: 100% 300%;
+  animation: gradient 8s infinite linear
+}
+.bg-new {
+  background: var(--bg-color) 100% !important;
+}
 
 /* elements */
 .top-menu {
   display: flex;
   align-items: center;
-  color: rgb(225,225,255);
-  background-color: rgb(0,0,50);
-  box-shadow: 8px 0px 8px rgba(0,0,50,0.75);
+  box-shadow: 0px 4px 4px rgba(0,0,50,0.5);
   padding: 6px 12px;
   margin-bottom: 8px;
   height: 28px;
@@ -123,36 +253,61 @@ body {
   box-shadow: 0px 4px 4px rgba(0,0,0,0.25);
   padding: 8px;
   cursor: pointer;
-  text-transform: uppercase
+  border: none
 }
 .btn-disabled {
-  color: rgb(100,100,100);
-  background-color: rgb(200,200,200);
-  box-shadow: 0px 2px 2px rgba(0,0,0,0.1);
+  color: var(--gray-color);
+  background-color: rgba(255,255,255,0.1);
+  box-shadow: none;
   cursor: default
 }
 .btn.icon {
   padding: 1px 8px 3px;
   border-radius: 16px;
 }
+.btn.inline {
+  box-shadow: none;
+}
+.btn:not(.btn-disabled):hover {
+  box-shadow: 2px 4px 4px rgba(0,0,0,0.5), 48px 48px rgba(0,0,0,0.2) inset;
+}
+.btn.inline:hover {
+  box-shadow: 48px 48px rgba(0,0,0,0.2) inset;
+}
+.icon {
+  padding: 0 4px
+}
 .link {
   text-decoration: underline;
   cursor: pointer;
 }
 .list-item {
-  box-shadow: -2px 2px 4px rgba(0,0,0,0.15);
+  box-shadow: -2px 2px 4px var(--secondary-color), 2px 2px 4px var(--secondary-color);
   margin-bottom: 8px;
   border-radius: 2px;
+  background-color: var(--bg-color);
+}
+.header {
+  color: var(--txt-color) !important;
+  padding: 8px 0;
+  font-weight: bold;
 }
 .input-text {
-  height: 24px;
-  padding: 4px
+  padding: 8px
 }
 .label {
   padding: 4px;
   border-radius: 4px;
   margin: 0 8px;
   font-size: 14px
+}
+.sublist-item {
+  padding: 4px;
+  background-color: rgba(0,0,0,0.1);
+  border-radius: 4px;
+  font-size: 15px;
+  box-shadow: 1px 1px 4px;
+  margin: 8px 0;
 }
 
 /* text */
@@ -163,6 +318,12 @@ body {
 .text-center {
   text-align: center;
   line-height: 1.5;
+}
+.text-header {
+  color: var(--dark-color)
+}
+.text-bold {
+  font-weight: 400;
 }
 
 /* state */

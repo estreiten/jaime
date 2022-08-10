@@ -6,12 +6,12 @@
   <script src="script.js"></script>
 </head>
 <body>
-  <header class="top-menu">
-    <div class="btn" onclick="location.reload()">Home</div>
+  <header class="top-menu primary">
+    <div class="btn inline" onclick="location.reload()">HOME</div>
     <div class="v-separator"></div>
     <div class="flex-main title">{{title}}</div>
     <div class="v-separator"></div>
-    <div class="btn" onclick="logout()">Log out</div>
+    <div class="btn inline" onclick="logout()">LOG OUT</div>
   </header>
   <main id="main">
     <script>request('/router')</script>

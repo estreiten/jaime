@@ -95,21 +95,15 @@ const logout = () => {
   location.reload()
 }
 
-const updateEnv = async (el , env, bot) => {
-  const itemEl = el.closest('.list-item')
-  const statusEl = itemEl.firstElementChild
-  if (!statusEl.classList.contains('status-running')) {
-    statusEl.classList.remove('status-ok', 'status-error')
-    statusEl.classList.add('status-running')
-    const statusTxt = statusEl.firstElementChild
-    statusTxt.classList.remove('text-ok', 'text-error')
-    statusTxt.classList.add('text-running')
-    statusTxt.innerHTML = 'Running'
-    el.classList.add('btn-disabled')
-    el.innerHTML = 'Running'
+const updateEnv = async (btnEl, env, bot) => {
+  const itemEl = btnEl.closest('.list-item')
+  if (!btnEl.classList.contains('btn-disabled')) {
+    itemEl.classList.remove('bg-success', 'bg-error', 'bg-new')
+    itemEl.classList.add('bg-progress')
+    btnEl.classList.add('btn-disabled')
     const params = bot !== undefined ? {env, bot} : {env}
-    request('/update','post', params).then(() => {
-      setTimeout(() => { location.reload() }, 1000 * 60 * 1)
+    request('/update','post', params).finally(() => {
+       location.reload()
     })
   }
 }
@@ -164,13 +158,9 @@ const listLogs = async (type, key, bot) => {
 
 const triggerAction = async (el, actionKey, bot) => {
    const itemEl = el.closest('.list-item')
-   const statusEl = itemEl.firstElementChild
-   if (!statusEl.classList.contains('status-running')) {
-    statusEl.classList.remove('status-ok', 'status-error')
-    statusEl.classList.add('status-running')
-    el.classList.add('btn-disabled')
-    const lastEl = itemEl.getElementsByClassName('action-status')[0]
-    lastEl.innerHTML = 'Running'
+   const statusEl = itemEl.getElementsByClassName('action-status')[0]
+   if (statusEl.innerHTML !== 'Running') {
+    statusEl.innerHTML = 'Running'
     const params = bot !== null ? {key: actionKey, bot} : {key: actionKey}
     request('/action','post', params).then(() => {
       setTimeout(() => { location.reload() }, 1000 * 60 * 1)
