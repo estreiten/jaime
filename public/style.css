@@ -14,11 +14,14 @@
   --success-light-shadow: rgba(107,227,155,0.6);
   --success-dark: #116332;
   --success-gray: rgb(79,168,114);
+  --success-bg: rgb(126,210,175);
   --error-color: rgb(143,38,0);
   --error-shadow: rgba(143,38,0, 0.7);
   --error-light: rgb(219,107,66);
   --error-light-shadow: rgba(219,107,66,0.6);
   --error-dark: #5C1800;
+  --error-gray: #A24F30;
+  --error-bg: rgb(203,138,100);
 }
 
 @keyframes rotate {
@@ -78,6 +81,10 @@ input {
 }
 input:focus {
   outline: none
+}
+
+pre {
+  font-size: 14px
 }
 
 /* layouts */
@@ -179,6 +186,9 @@ input:focus {
 .mb-8 {
   margin-bottom: 24px !important
 }
+.ml-1 {
+  margin-left: 4px !important
+}
 .ml-2 {
   margin-left: 8px !important
 }
@@ -247,6 +257,18 @@ input:focus {
 }
 .bg-new {
   background: var(--bg-color) 100% !important;
+}
+.header-success {
+  background: var(--success-bg);
+  box-shadow: 2px 2px 4px var(--success-shadow)
+}
+.header-error {
+  background: var(--error-bg);
+  box-shadow: 2px 2px 4px var(--error-shadow)
+}
+.header-progress {
+  background: var(--bg-color);
+  box-shadow: 2px 2px 4px var(--light-color)
 }
 
 /* elements */
@@ -378,6 +400,11 @@ input:focus {
 .title {
   font-size: 18px;
   cursor: default
+}
+.subtitle {
+  margin: 0 -16px;
+  position: sticky;
+  top: 0
 }
 .text-center {
   text-align: center;

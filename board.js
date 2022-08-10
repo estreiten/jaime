@@ -35,7 +35,7 @@ const environmentsHtml = async () => {
           const logStatus = log.status == 0 ? 'success' : log.status > 0 ? 'error' : 'progress'
           html += `<div 
                     class="sublist-item btn flex item-${logStatus} ${index === 0 ? ' mb-8' : ''}"
-                    onclick="showLog('env', '${env.name}', ${date}, ${status}${env.bot  !== undefined ? ', ' + env.bot : ''})">
+                    onclick="showLog('env', '${env.name}', ${date}, ${log.status}${env.bot  !== undefined ? ', ' + env.bot : ''})">
                     <div class="icon icon-${logStatus}">${log.status == 0 ? '✔' : log.status > 0 ? '✖' : '⌛'}</div>
                     <span class="date">${date}</span></div>`
         }

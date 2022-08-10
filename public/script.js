@@ -68,6 +68,16 @@ const parseDates = () => {
   }
 }
 
+const getStatusTxt = (status) => {
+  const statInt = parseInt(status)
+  switch (statInt) {
+    case 0: return 'success'
+    case -2: return 'new'
+    case -1: return 'progress'
+    default: return 'error'
+  }
+}
+
 const loginScript = () => {
   if (document.forms['loginForm']) {
     document.getElementById('passError').style.display = 'none';
@@ -117,10 +127,11 @@ const showLog = async (type, key, log, status, bot) => {
     path += `&bot=${bot}`
   }
   const logTxt = await request(path, 'get')
+  const statusTxt = getStatusTxt(status)
   document.querySelector('main').innerHTML = `
-    <div class="link" onclick="listLogs('${type}', '${key}'${bot  !== undefined ? ', ' + bot : ''})">All ${type === 'env' ? 'Updates' : 'Runs'}</div>
-    <h2 class="${status > 0 ? 'status-error' : 'status-ok'} pa-4">
-      <span class="date">${log}</span> ${type === 'env' ? 'on' : 'by'} "${key.toUpperCase()}"</h2>
+    <div class="subtitle header flex align-center header-${statusTxt}">
+      <div class="icon icon-${statusTxt}">${status == 0 ? '✔' : status > 0 ? '✖' : '⌛'}</div>
+      <span class="ml-1 date">${log}</span>${type === 'env' ? ' on' : ' by'} "${key.toUpperCase()}"</div>
     <pre><code>${logTxt}</code></pre>`
   parseDates()
 }
