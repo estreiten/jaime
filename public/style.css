@@ -47,10 +47,25 @@ body {
   margin: 0;
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   background-color: var(--white-color);
+  overflow-y: hidden;
 }
 
 #main {
-  margin: 16px
+  padding: 0 16px 16px;
+  overflow-y: auto;
+  height: calc(100vh - 28px - (2*16px));
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--light-color);
+}
+
+#main::-webkit-scrollbar {
+  width: 12px;
+}
+#main::-webkit-scrollbar-track {
+  background: var(--light-color);
+}
+#main::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
 }
 
 input {
@@ -240,9 +255,7 @@ input:focus {
   align-items: center;
   box-shadow: 0px 4px 4px rgba(0,0,50,0.5);
   padding: 6px 12px;
-  margin-bottom: 8px;
   height: 28px;
-  position: sticky;
   top: 0
 }
 .top-menu * {
@@ -320,7 +333,8 @@ input:focus {
   line-height: 1.5;
 }
 .text-header {
-  color: var(--dark-color)
+  color: var(--dark-color);
+  margin: 16px 0
 }
 .text-bold {
   font-weight: 400;

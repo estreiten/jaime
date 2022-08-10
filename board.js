@@ -17,7 +17,9 @@ module.exports = {
     const actions = await actionManager.getActions()
     const actionsByGroup = actions.groupBy('group').undefinedFirst()
     let isRunning = false
-    let html = '<div class="flex align-center"><h4 class="mt-8 text-header">ENVIRONMENTS</h4>'
+    let html = `<div class="flex flex-column">
+                  <h4 class="text-header">ENVIRONMENTS</h4>
+                  <div class="flex flex-wrap">`
     for (let index = 0; index < environments.length; index++) {
       const env = environments[index];
       const hasLogs = !!env.logs && env.logs.length > 0
@@ -26,7 +28,7 @@ module.exports = {
       if (status === -1) {
         isRunning = true
       }
-      html += `<div class="flex-column mx-4 py-2 px-4 list-item align-center bg-${statusTxt}">
+      html += `<div class="flex-column mx-4 mb-2 py-2 px-4 list-item align-center bg-${statusTxt}">
                 <div class="title full-width text-center header">${env.name.toUpperCase()}</div>
                   <div class="text-center">`;
       if (env.logs.length === 0) {
@@ -54,7 +56,7 @@ module.exports = {
               </div>
             </div>`
     }
-    html += '</div>'
+    html += '</div></div>'
     const hasUndefinedGroup = Object.keys(actionsByGroup)[0] === 'undefined'
     html += `<h2 class="text-header mt-8${!hasUndefinedGroup ? ' mb-0' : ''}">ACTIONS</h2><div class="flex-column mx-2">`
     for (const group in actionsByGroup) {
