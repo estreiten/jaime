@@ -11,16 +11,11 @@ const getStatusTxt = (status) => {
   }
 }
 
-module.exports = {
-  draw: async () => {
-    const environments = await envManager.getEnvironments()
-    const actions = await actionManager.getActions()
-    const actionsByGroup = actions.groupBy('group').undefinedFirst()
-    let isRunning = false
-    let html = `<div class="flex flex-column">
-                  <h4 class="text-header">ENVIRONMENTS</h4>
-                  <div class="flex flex-wrap">`
-    for (let index = 0; index < environments.length; index++) {
+const environmentsHtml = async () => {
+  const environments = await envManager.getEnvironments()
+  let html = '<div class="flex flex-wrap">'
+  let isRunning = false
+  for (let index = 0; index < environments.length; index++) {
       const env = environments[index];
       const hasLogs = !!env.logs && env.logs.length > 0
       const status =  hasLogs ? env.logs[0].status : -2
@@ -56,7 +51,20 @@ module.exports = {
               </div>
             </div>`
     }
-    html += '</div></div>'
+    html += '</div>'
+    return { html, isRunning }
+}
+
+module.exports = {
+  draw: async () => {
+    const actions = await actionManager.getActions()
+    const actionsByGroup = actions.groupBy('group').undefinedFirst()
+    let isRunning = false
+    let html = `<div class="flex flex-column">
+                  <h4 class="text-header">ENVIRONMENTS</h4>`
+    const envsHtml = await environmentsHtml()
+    html += envsHtml.html + '</div>'
+    isRunning = envsHtml.isRunning
     const hasUndefinedGroup = Object.keys(actionsByGroup)[0] === 'undefined'
     html += `<h2 class="text-header mt-8${!hasUndefinedGroup ? ' mb-0' : ''}">ACTIONS</h2><div class="flex-column mx-2">`
     for (const group in actionsByGroup) {
