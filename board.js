@@ -25,7 +25,7 @@ const environmentsHtml = async () => {
       }
       html += `<div class="flex-column mr-4 mb-2 py-2 px-4 list-item align-center bg-${statusTxt}">
                 <div class="title full-width text-center header">${env.name.toUpperCase()}</div>
-                  <div class="text-center">`;
+                  <div class="flex-max text-center">`;
       if (env.logs.length === 0) {
         html += 'Not updated yet'
       } else {
@@ -39,9 +39,11 @@ const environmentsHtml = async () => {
                     <div class="icon icon-${logStatus}">${log.status == 0 ? '✔' : log.status > 0 ? '✖' : '⌛'}</div>
                     <span class="date">${date}</span></div>`
         }
-        html += `<div class="btn secondary text-bold pa-0 ma-2" onclick="listLogs('env', '${env.name}'${env.bot  !== undefined && env.bot !== null ? ', ' + env.bot : ''})">
-                  ⬇ <span class="ml-2">PREVIOUS LOGS</span>
-                </div>`
+        if (env.logs.length > 3) {
+          html += `<div class="btn secondary text-bold pa-0 ma-2" onclick="listLogs('env', '${env.name}'${env.bot  !== undefined && env.bot !== null ? ', ' + env.bot : ''})">
+                    ⬇ <span class="ml-2">PREVIOUS UPDATES</span>
+                  </div>`
+        }
       }
       html += `</div>
               <div
