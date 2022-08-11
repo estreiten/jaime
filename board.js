@@ -23,7 +23,7 @@ const environmentsHtml = async () => {
       if (status === -1) {
         isRunning = true
       }
-      html += `<div class="flex-column mx-4 mb-2 py-2 px-4 list-item align-center bg-${statusTxt}">
+      html += `<div class="flex-column mr-4 mb-2 py-2 px-4 list-item align-center bg-${statusTxt}">
                 <div class="title full-width text-center header">${env.name.toUpperCase()}</div>
                   <div class="text-center">`;
       if (env.logs.length === 0) {
