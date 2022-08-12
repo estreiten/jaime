@@ -201,7 +201,8 @@ const triggerAction = async (btnEl, actionKey, bot) => {
 const toggleAction = async (el, actionKey, bot) => {
   const params = bot !== null ? {key: actionKey, bot} : {key: actionKey}
   request('/toggle','post', params).then(() => {
-    const badge = el.closest('.grid-col').previousElementSibling.querySelector('.badge')
+    const ancestorEl = el.closest('.grid-col') || el.closest('.catalog-row')
+    const badge = ancestorEl.previousElementSibling.querySelector('.badge')
     if (el.classList.contains('btn-pressed')) {
       el.classList.remove('btn-pressed')
       badge.innerHTML = '⏱ ON'

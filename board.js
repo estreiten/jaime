@@ -16,7 +16,7 @@ const getStatusTxt = (status) => {
 
 const environmentsHtml = async () => {
   const environments = await envManager.getEnvironments()
-  let html = '<div class="flex flex-wrap">'
+  let html = '<div class="flex flex-wrap flex-mobile">'
   let isRunning = false
   for (let index = 0; index < environments.length; index++) {
       const env = environments[index];
@@ -66,7 +66,7 @@ const actionsBtns = (actions) => {
     const action = actions[index];
     const hasLogs = !!action.logs && action.logs.length > 0
     const status = hasLogs ? action.logs[0].status : -2
-    html += `<div class="btn primary flex mr-2 ${status === -1 ? 'btn-disabled' : ''}"
+    html += `<div class="btn primary flex mr-2 mb-2${status === -1 ? ' btn-disabled' : ''}"
               onclick="triggerAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">
               ${status === -1 ? '<div class="icon icon-progress">⌛</div>' : ''}
               ${action.name.toUpperCase()}
@@ -80,7 +80,7 @@ const actionsGrid = (actions) => {
                 <div class="grid-header">
                   <div class="grid-col col-2 justify-center">NAME</div>
                   <div class="grid-col col-3 justify-center">LAST RUN</div>
-                  <div div class = "grid-col col-2 justify-center" >
+                  <div class="grid-col col-2 justify-center">
                     SCHEDULE
                     <div class="btn secondary icon-sm ml-2"
                       onclick="openTab('https://github.com/node-cron/node-cron#allowed-fields')" >
@@ -128,6 +128,64 @@ const actionsGrid = (actions) => {
   return html
 }
 
+const actionsCatalog = (actions) => {
+  let html = '<div class="catalog">'
+  for (let index = 0; index < actions.length; index++) {
+    const action = actions[index];
+    const hasLogs = !!action.logs && action.logs.length > 0
+    const status = hasLogs ? action.logs[0].status : -2
+    const statusTxt = getStatusTxt(status)
+    const lastRun = hasLogs ? parseInt(action.logs[0].date) : null
+    html += `<div class="catalog-row">
+              <div class="catalog-header">NAME</div>
+              <div class="catalog-col">${action.name}</div>
+            </div>
+            <div class="catalog-row">
+              <div class="catalog-header">LAST RUN</div>
+              <div class="catalog-col">
+                ${!!lastRun ?
+                  `<div class="icon icon-${statusTxt}">${status == 0 ? '✔' : status > 0 ? '✖' : status == -1 ? '⌛' : ''}</div>
+                  <span class="date ml-2">${lastRun}</span>` : ''}
+              </div>
+            </div>
+            <div class="catalog-row">
+              <div class="catalog-header">
+                SCHEDULE
+                <div class="btn secondary icon-sm ml-2"
+                  onclick="openTab('https://github.com/node-cron/node-cron#allowed-fields')" >
+                  ℹ</div>
+              </div>
+              <div class="catalog-col">
+                ${!!action.cron ? `<div class="badge">⏱ ${action.isPaused ? 'PAUSED' : 'ON'}</div><span class="ml-2">${action.cron}</span>` : ''}
+              </div>
+            </div>
+            <div class="catalog-row">
+              <div class="catalog-header">ACTIONS</div>
+              <div class="catalog-col">
+                <div class="flex flex-max justify-spaceEvenly align-center">
+                  ${!!action.cron ?
+                  `<div class="btn condensed secondary ${action.isPaused ? 'btn-pressed' : 'my-1'}" 
+                    onclick="toggleAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">
+                    &#10074;&#10074;<span class="ml-2">⏱</span>
+                  </div>` : ''
+                  }
+                  <div class="btn condensed secondary my-1${!!hasLogs ? '' : ' btn-disabled'}" 
+                    onclick="listLogs('action', '${action.key}', '${action.name}'${action.bot  !== undefined && action.bot !== null  ? ', ' + action.bot : ''})">
+                    📋<span class="ml-2">LOGS</span>
+                  </div>
+                  <div class="btn condensed primary my-1${status == -1 ? ' btn-disabled' : ''}"
+                    onclick="triggerAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">
+                    ▶<span class="ml-2">RUN</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="catalog-separator"></div>`
+  }
+  html += '</div>'
+  return html
+}
+
 const actionGroupHtml = (group, actions, renderFn, cls) => {
   let html = `<div class="flex flex-column container-embed mb-2 mr-2 ${cls || ''}">`
   if (group !== 'undefined') {
@@ -158,7 +216,8 @@ const actionsHtml = async () => {
           <div id="actionGrid" class= "flex flex-wrap hidden">`
   for (const group in actionsByGroup) {
     const groupActions = actionsByGroup[group];
-    html += actionGroupHtml(group, groupActions, actionsGrid, 'full-width')
+    html += actionGroupHtml(group, groupActions, actionsGrid, 'grid-container')
+    html += actionGroupHtml(group, groupActions, actionsCatalog, 'catalog-container')
   }
   html += '</div>'
   return { html, isRunning }

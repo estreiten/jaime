@@ -1,0 +1,95 @@
+/* Phones */
+@media screen and ((max-width: 480px) or (max-height: 480px)) {
+  #main {
+    padding: 0 4px 4px
+  }
+
+  .title {
+    font-size: 16px;
+  }
+  .text-header {
+    margin: 8px 0
+  }
+
+  .flex-mobile {
+    justify-content: center;
+  }
+  .pa-8 {
+    padding: 18px !important
+  }
+  .pa-4 {
+    padding: 12px !important
+  }
+  .pr-8 {
+  padding-right: 18px !important
+  }
+  .py-2.px-4 {
+    padding: 8px 12px !important
+  }
+  .mx-4 {
+    margin: 0 12px !important
+  }
+  .my-4 {
+    margin: 12px 0 !important
+  }
+  .mt-4 {
+    margin-top: 12px !important
+  }
+  .mt-8 {
+    margin-top: 18px !important
+  }
+  .mr-4 {
+    margin-right: 12px !important
+  }
+  .mb-4 {
+    margin-bottom: 12px !important
+  }
+  .mb-8 {
+    margin-bottom: 18px !important
+  }
+  .mx-4.my-2 {
+    margin: 8px 12px !important
+  }
+  
+  .top-menu {
+    height: 20px;
+    padding: 4px;
+    font-size: 14px;
+  }
+  .top-menu * {
+    margin: 0 2px
+  }
+  .btn {
+    padding: 4px
+  }
+  .container-embed {
+    padding: 8px
+  }
+
+  .catalog-container {
+    display: flex
+  }
+  .grid-container {
+    display: none
+  }
+}
+
+/* Tablets and intermediates, help rendering the table */
+@media screen and (max-width: 920px) and (min-height: 920px) {
+  #main {
+    padding: 0 4px 4px
+  }
+  .grid {
+    font-size: 14px;
+  }
+  .container-embed {
+    padding: 8px
+  }
+}
+
+/* Bigger than laptop screens */
+@media screen and (min-width: 1100px) {
+  .grid-container {
+    max-width: 1030px;
+  }
+}
