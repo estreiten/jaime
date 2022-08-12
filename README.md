@@ -218,5 +218,5 @@ If present and a new env/action is triggered, it tries again after 10 minutes. I
 - Support for HTTPS, both Jaime and bots.
 - Add environments and actions from the Board.
 - Generic envs: create a specific folder for scripts to run on every environment, adding the env name as parameter.
-- Board visual improvements.
 - Optional tokens + password generator on installation step.
+- Feature board's different situations and states for those who won't have to face them (colors, things in progress, etc)
