@@ -106,11 +106,17 @@ pre {
 .flex-wrap {
   flex-wrap: wrap;
 }
+.justify-center {
+  justify-content: center;
+}
 .justify-spaceAround {
   justify-content: space-around;
 }
 .justify-spaceBetween {
   justify-content: space-between;
+}
+.justify-spaceEvenly {
+  justify-content: space-evenly;
 }
 .align-center {
   align-items: center;
@@ -153,14 +159,23 @@ pre {
 .py-2.px-4 {
   padding: 8px 16px !important
 }
+.ma-0 {
+  margin: 0 !important
+}
 .ma-2 {
   margin: 8px !important
+}
+.mx-1 {
+  margin: 0 4px !important
 }
 .mx-2 {
   margin: 0 8px !important
 }
 .mx-4 {
   margin: 0 16px !important
+}
+.my-1 {
+  margin: 4px 0 !important
 }
 .my-2 {
   margin: 8px 0 !important
@@ -173,6 +188,9 @@ pre {
 }
 .mt-8 {
   margin-top: 24px !important
+}
+.mr-2 {
+  margin-right: 8px !important
 }
 .mr-4 {
   margin-right: 16px !important
@@ -299,18 +317,35 @@ pre {
   box-shadow: none;
   cursor: default
 }
+.btn-pressed {
+  box-shadow: 0px 2px 2px rgb(0 0 0 / 25%);
+  margin-top: 2px;
+  background-color: var(--white-color);
+}
 .btn.icon {
   padding: 1px 8px 3px;
   border-radius: 16px;
 }
+.btn.icon-sm {
+  padding: 2px 8px;
+  font-size: 12px;
+  border-radius: 16px;
+}
 .btn.inline {
   box-shadow: none;
+}
+.btn.condensed {
+  padding: 4px 8px;
+  height: fit-content;
 }
 .btn:not(.btn-disabled):hover {
   box-shadow: 2px 4px 4px rgba(0,0,0,0.5), 48px 48px rgba(0,0,0,0.2) inset;
 }
 .btn.inline:hover {
   box-shadow: 48px 48px rgba(0,0,0,0.2) inset;
+}
+.btn.btn-pressed:hover {
+  box-shadow: 0px 2px 2px rgb(0 0 0 / 25%), 48px 48px rgba(0,0,0,0.2) inset;
 }
 .icon {
   padding: 0 4px
@@ -346,6 +381,75 @@ pre {
   font-size: 15px;
   box-shadow: 1px 1px 4px;
   margin: 8px 0;
+}
+.container-embed {
+  padding: 16px;
+  background-color: var(--bg-color);
+  box-shadow: 0px 0px 4px var(--gray-color) inset;
+  border-radius: 4px;
+}
+.badge {
+  background-color: var(--secondary-color);
+  color: var(--txt-color);
+  border-radius: 16px;
+  padding: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: 0px 0px 1px inset;
+}
+
+.tabs {
+  display: flex;
+}
+.tab {
+  margin: 4px;
+  padding: 4px;
+  color: var(--gray-color);
+  border-bottom: 4px solid var(--light-color);
+}
+.tab.selected {
+  color: var(--txt-color);
+  border-bottom: 4px solid var(--primary-color);
+}
+.tab:hover:not(.selected) {
+  cursor: pointer;
+  box-shadow: 48px 48px rgba(0,0,0,0.1) inset;
+  border-bottom: 4px solid var(--primary-color);
+  color: var(--txt-color);
+  border-radius: 2px 2px 0 0;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.grid-header {
+  display: flex
+}
+.grid-row {
+  display: flex
+}
+.grid-col {
+  background-color: var(--light-color);
+  color: var(--txt-color);
+  padding: 4px;
+  margin: 2px 2px;
+  display: flex;
+  align-items: center;
+  border-radius: 2px;
+  flex: 1 0 auto
+}
+.col-2 {
+  flex: 0 0 20%
+}
+.col-3 {
+  flex: 0 0 30%
+}
+.grid-header .grid-col {
+  background-color: var(--dark-color);
+  color: var(--txt-alt-color);
+  margin: 0 2px 2px
 }
 
 #dialog {

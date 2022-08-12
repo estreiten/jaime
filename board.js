@@ -2,6 +2,9 @@ const envManager = require('./env.js');
 const actionManager = require('./action.js');
 
 const getStatusTxt = (status) => {
+  if (isNaN(status)) {
+    return 'progress'
+  }
   const statInt = parseInt(status)
   switch (statInt) {
     case 0: return 'success'
@@ -35,12 +38,12 @@ const environmentsHtml = async () => {
           const logStatus = log.status == 0 ? 'success' : log.status > 0 ? 'error' : 'progress'
           html += `<div 
                     class="sublist-item btn flex item-${logStatus} ${index === 0 ? ' mb-8' : ''}"
-                    onclick="showLog('env', '${env.name}', ${date}, ${log.status}${env.bot  !== undefined ? ', ' + env.bot : ''})">
+                    onclick="showLog('env', '${env.name}', '${env.name}', ${date}, ${log.status}${env.bot  !== undefined ? ', ' + env.bot : ''})">
                     <div class="icon icon-${logStatus}">${log.status == 0 ? '✔' : log.status > 0 ? '✖' : '⌛'}</div>
                     <span class="date">${date}</span></div>`
         }
         if (env.logs.length > 3) {
-          html += `<div class="btn secondary text-bold pa-0 ma-2" onclick="listLogs('env', '${env.name}'${env.bot  !== undefined && env.bot !== null ? ', ' + env.bot : ''})">
+          html += `<div class="btn secondary text-bold pa-0 ma-2" onclick="listLogs('env', '${env.name}', '${env.name}'${env.bot  !== undefined && env.bot !== null ? ', ' + env.bot : ''})">
                     ⬇ <span class="ml-2">PREVIOUS UPDATES</span>
                   </div>`
         }
@@ -55,6 +58,110 @@ const environmentsHtml = async () => {
     }
     html += '</div>'
     return { html, isRunning }
+}
+
+const actionsBtns = (actions) => {
+  let html = ''
+  for (let index = 0; index < actions.length; index++) {
+    const action = actions[index];
+    const hasLogs = !!action.logs && action.logs.length > 0
+    const status = hasLogs ? action.logs[0].status : -2
+    html += `<div class="btn primary flex mr-2 ${status === -1 ? 'btn-disabled' : ''}"
+              onclick="triggerAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">
+              ${status === -1 ? '<div class="icon icon-progress">⌛</div>' : ''}
+              ${action.name.toUpperCase()}
+            </div>`
+  }
+  return html
+}
+
+const actionsGrid = (actions) => {
+  let html = `<div class="grid">
+                <div class="grid-header">
+                  <div class="grid-col col-2 justify-center">NAME</div>
+                  <div class="grid-col col-3 justify-center">LAST RUN</div>
+                  <div div class = "grid-col col-2 justify-center" >
+                    SCHEDULE
+                    <div class="btn secondary icon-sm ml-2"
+                      onclick="openTab('https://github.com/node-cron/node-cron#allowed-fields')" >
+                      ℹ</div>
+                  </div>
+                  <div class="grid-col justify-center">ACTIONS</div>
+                </div>`
+  for (let index = 0; index < actions.length; index++) {
+    const action = actions[index];
+    const hasLogs = !!action.logs && action.logs.length > 0
+    const status = hasLogs ? action.logs[0].status : -2
+    const statusTxt = getStatusTxt(status)
+    const lastRun = hasLogs ? parseInt(action.logs[0].date) : null
+    html += `<div class="grid-row">
+              <div class="grid-col col-2 justify-center">${action.name}</div>
+              <div class="grid-col col-3 justify-center">
+                ${!!lastRun ?
+                  `<div class="icon icon-${statusTxt}">${status == 0 ? '✔' : status > 0 ? '✖' : status == -1 ? '⌛' : ''}</div>
+                  <span class="date ml-2">${lastRun}</span>` : ''}
+              </div>
+              <div class="grid-col col-2 justify-center">
+                ${!!action.cron ? `<div class="badge">⏱ ${action.isPaused ? 'PAUSED' : 'ON'}</div><span class="ml-2">${action.cron}</span>` : ''}
+              </div>
+              <div class="grid-col justify-center">
+                <div class="flex flex-max justify-spaceEvenly align-center">
+                  ${!!action.cron ?
+                  `<div class="btn condensed secondary ${action.isPaused ? 'btn-pressed' : 'my-1'}" 
+                    onclick="toggleAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">
+                    &#10074;&#10074;<span class="ml-2">⏱</span>
+                  </div>` : ''
+                  }
+                  <div class="btn condensed secondary my-1${!!hasLogs ? '' : ' btn-disabled'}" 
+                    onclick="listLogs('action', '${action.key}', '${action.name}'${action.bot  !== undefined && action.bot !== null  ? ', ' + action.bot : ''})">
+                    📋<span class="ml-2">LOGS</span>
+                  </div>
+                  <div class="btn condensed primary my-1${status == -1 ? ' btn-disabled' : ''}"
+                    onclick="triggerAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">
+                    ▶<span class="ml-2">RUN</span>
+                  </div>
+                </div>
+              </div>
+            </div>`
+  }
+  html += '</div>'
+  return html
+}
+
+const actionGroupHtml = (group, actions, renderFn, cls) => {
+  let html = `<div class="flex flex-column container-embed mb-2 mr-2 ${cls || ''}">`
+  if (group !== 'undefined') {
+    html += `<h4 class="text-header ma-0">${group}</h4>`
+  }
+  html += `<div class="flex flex-wrap mt-4">${renderFn(actions)}</div>
+          </div>`
+  return html
+}
+
+const actionsHtml = async () => {
+  const actions = await actionManager.getActions()
+  const actionsByGroup = actions.groupBy('group').undefinedFirst()
+  let html = `<div class="tabs">
+                <div class="tab selected" onclick="actionTab('actionButtons')">SIMPLE</div>
+                <div class="tab" onclick="actionTab('actionGrid')">DETAIL</div>
+              </div>
+              <div id="actionButtons" class= "flex flex-wrap">`
+  let isRunning = false
+  for (const group in actionsByGroup) {
+    const groupActions = actionsByGroup[group];
+    if ((groupActions.length > 0) && (groupActions[0].status == -1)) {
+      isRunning = true
+    }
+    html += actionGroupHtml(group, groupActions, actionsBtns)
+  }
+  html += `</div>
+          <div id="actionGrid" class= "flex flex-wrap hidden">`
+  for (const group in actionsByGroup) {
+    const groupActions = actionsByGroup[group];
+    html += actionGroupHtml(group, groupActions, actionsGrid, 'full-width')
+  }
+  html += '</div>'
+  return { html, isRunning }
 }
 
 const dialog = () => {
@@ -72,57 +179,17 @@ const dialog = () => {
 
 module.exports = {
   draw: async () => {
-    const actions = await actionManager.getActions()
-    const actionsByGroup = actions.groupBy('group').undefinedFirst()
     let isRunning = false
     let html = `<div class="flex flex-column">
                   <h4 class="text-header">ENVIRONMENTS</h4>`
     const envsHtml = await environmentsHtml()
     html += envsHtml.html + '</div>'
     isRunning = envsHtml.isRunning
-    const hasUndefinedGroup = Object.keys(actionsByGroup)[0] === 'undefined'
-    html += `<h2 class="text-header mt-8${!hasUndefinedGroup ? ' mb-0' : ''}">ACTIONS</h2><div class="flex-column mx-2">`
-    for (const group in actionsByGroup) {
-      const groupActions = actionsByGroup[group];
-      if (group !== 'undefined') {
-        html += `<h3 class="text-header">${group}</h3>`
-      }
-      html += '<div class="flex flex-wrap">'
-        for (let index = 0; index < groupActions.length; index++) {
-          const action = groupActions[index];
-          const hasLogs = !!action.logs && action.logs.length > 0
-          const status = hasLogs ? action.logs[0].status : 0
-          if (status === -1) {
-            isRunning = true
-          }
-          const lastRun = hasLogs ? parseInt(action.logs[0].date) : null
-          html += `<div class="flex mx-4 mb-4 pa-8 list-item">
-                    <div class="flex flex-max justify-spaceAround align-center">
-                      <div
-                        class="btn primary ${status === -1 ? 'btn-disabled' : ''}"
-                        onclick="triggerAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">${action.name.toUpperCase()}
-                      </div>
-                      <div class="action-updates text-center"><div class="action-status">${status === -1 ? 'Running' :
-                        !!lastRun ? `Last run: <span class="link date ${status > 0 ? 'status-error' : status == 0 ? 'status-ok' : 'status-running'}" onclick="showLog('action', '${action.key}', ${lastRun}, ${status}${action.bot  !== undefined && action.bot !== null ? ', ' + action.bot : ''})">${lastRun}</span>` :
-                        'Not run yet'}</div>
-                        ${!!hasLogs ? `<span class="link" onclick="listLogs('action', '${action.key}'${action.bot  !== undefined && action.bot !== null  ? ', ' + action.bot : ''})">Previous runs</span>` : ''}
-                      </div>`
-
-          if (!!action.cron) {
-            html +=`  <div class="action-schedule">
-                        <a href="https://github.com/node-cron/node-cron#allowed-fields" target="_blank">Schedule</a>: ${action.cron}
-                        <div
-                          class="btn icon primary ${status === -1 ? 'btn-disabled' : ''}"
-                          onclick="toggleAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">${action.isPaused ? '▶' : '&#10074;&#10074;'}</div>
-                      </div>`
-          }
-
-          html += ` </div>
-                  </div>`
-        }
-      html += '</div>'
-    }
-    html += '</div>' + dialog()
+    html += `<div class="flex flex-column">
+              <h4 class="text-header mb-2">ACTIONS</h4>`
+    const actsHtml = await actionsHtml()
+    html += actsHtml.html + '</div>' + dialog()
+    isRunning = isRunning || actsHtml.isRunning
     if (isRunning) {
       html += '<script>setTimeout(location.reload, 1000 * 60 * 5)</script>'
     }
