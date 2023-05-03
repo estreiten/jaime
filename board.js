@@ -200,10 +200,10 @@ const actionsHtml = async () => {
   const actions = await actionManager.getActions()
   const actionsByGroup = actions.groupBy('group').undefinedFirst()
   let html = `<div class="tabs">
-                <div class="tab selected" onclick="actionTab('actionButtons')">SIMPLE</div>
-                <div class="tab" onclick="actionTab('actionGrid')">DETAIL</div>
+                <div class="tab" onclick="actionTab('actionButtons')">SIMPLE</div>
+                <div class="tab selected" onclick="actionTab('actionGrid')">DETAIL</div>
               </div>
-              <div id="actionButtons" class= "flex flex-wrap">`
+              <div id="actionButtons" class= "flex flex-wrap hidden">`
   let isRunning = false
   for (const group in actionsByGroup) {
     const groupActions = actionsByGroup[group];
@@ -213,7 +213,7 @@ const actionsHtml = async () => {
     html += actionGroupHtml(group, groupActions, actionsBtns)
   }
   html += `</div>
-          <div id="actionGrid" class= "flex flex-wrap hidden">`
+          <div id="actionGrid" class= "flex flex-wrap">`
   for (const group in actionsByGroup) {
     const groupActions = actionsByGroup[group];
     html += actionGroupHtml(group, groupActions, actionsGrid, 'grid-container')
