@@ -70,10 +70,10 @@ app.post('/update', async (req, res) => {
   try {
     console.log('update trigger received for', req.body.env)
     if (authorized(req)) {
-      if (!!req.body.env) {
+      if (!!req.body.env && !!req.body.version) {
         if (req.body.bot === undefined) {
           if (Object.keys(config.env).indexOf(req.body.env) > -1) {
-            envManager.updateByEnvName(req.body.env)
+            envManager.updateByEnvName(req.body.env, req.body.version)
             res.sendStatus(200)
           } else {
             res.sendStatus(400)
@@ -155,13 +155,13 @@ app.post('/action', async (req, res) => {
       if (!!req.body.key) {
         if (req.body.bot === undefined) {
           if (config.actions.some(action => action.key === req.body.key)) {
-            actionManager.execute(req.body.key)
+            actionManager.execute(req.body.key, req.body.param)
             res.sendStatus(200)
           } else {
             res.sendStatus(400)
           }
         } else {
-          const status = await botManager.executeAction(req.body.bot, req.body.key)
+          const status = await botManager.executeAction(req.body.bot, req.body.key, req.body.param)
           res.sendStatus(status)
         }
       } else {
@@ -192,6 +192,39 @@ app.post('/toggle', async (req, res) => {
           const status = await botManager.toggleAction(req.body.bot, req.body.key)
           res.sendStatus(status)
         }
+      } else {
+        res.sendStatus(400)
+      }
+    } else {
+      res.redirect('/')
+    }
+  } catch (err) {
+    console.error(err.message)
+    res.sendStatus(500)
+  }
+})
+
+app.get('/smoke', async (req, res) => {
+  try {
+    if (authorized(req)) {
+      res.setHeader('view', 'smoke')
+      res.sendFile('views/smoke.html', {root: '.'})
+    } else {
+      res.redirect('/')
+    }
+  } catch (err) {
+    console.error(err.message)
+    res.sendStatus(500)
+  }
+})
+
+app.post('/smoke', async (req, res) => {
+  try {
+    if (authorized(req)) {
+      if (req.body) {
+        fs.writeFileSync('/home/i78s-client/cypress/smoke.json', JSON.stringify(req.body, null, 2))
+        actionManager.execute('smoke-notification')
+        res.sendStatus(200)
       } else {
         res.sendStatus(400)
       }

@@ -15,6 +15,8 @@
   --success-dark: #116332;
   --success-gray: rgb(79,168,114);
   --success-bg: rgb(126,210,175);
+  --warn-light: rgba(227, 225, 107, 0.6);
+  --warn-dark: #635911;
   --error-color: rgb(143,38,0);
   --error-shadow: rgba(143,38,0, 0.7);
   --error-light: rgb(219,107,66);
@@ -255,6 +257,12 @@ pre {
 }
 .icon-success {
   color: var(--success-dark)
+}
+.item-warn {
+  background-color: var(--warn-light) !important;
+}
+.icon-warn {
+  color: var(--warn-dark)
 }
 .item-error {
   background-color: var(--error-light-shadow) !important;
@@ -534,6 +542,30 @@ pre {
   padding: 8px;
   scrollbar-width: thin;
   scrollbar-color: var(--light-color) var(--gray-color);
+}
+
+.select-container {
+  display: grid;
+  width: 220px;
+}
+.select-container label {
+  font-variant: small-caps;
+}
+.select-container input {
+  z-index: 1;
+  width: 75%;
+  border-radius: 4px 0 0 4px;
+  font-size: 16px;
+  padding: 4px;
+}
+.select-container select {
+  background-color: var(--bg-color);
+  color: var(--txt-color);
+  border-radius: 4px;
+  border: none;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+  margin: 0 4px;
+  outline: none;
 }
 
 /* text */

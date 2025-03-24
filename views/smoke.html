@@ -1,0 +1,29 @@
+<div class="flex flex-column container-embed my-2 mr-2">
+  <h4 class="text-header mb-2">SMOKE TESTS IN QA</h4>
+  <div class="flex flex-column flex-max justify-spaceEvenly align-center">
+    <div class="btn condensed primary ma-2 align-self-start" onclick="triggerAction(this, 'pre-smoke-qa', null)">
+      <span>1- Prepare for smoke tests</span>
+    </div>
+    <div class="flex flex-column flex-max align-self-start ma-2">
+      <h4 class="text-header ml-1 my-1">2- Send smoke results and run email notifier</h4>
+      <div class="flex flex-max">
+        <input type="file" class="ma-2" />
+        <div class="btn condensed primary my-1" onclick="sendSmoke()">
+          <span>SEND</span>
+        </div>
+      </div>
+    </div>
+    <div class="btn condensed primary ma-2 align-self-start" onclick="triggerAction(this, 'post-smoke-qa', null)">
+      <span>3- Clean after smoke tests</span>
+    </div>
+  </div>
+</div>
+<div id="dialog" class="cover" onclick="closeDialog(event)">
+  <div class="modal">
+    <div class="modal-bar">
+      <div id="dialog-title" class="modal-title">Title</div>
+      <div class="modal-close btn inline" onclick="closeDialog(event)">✖</div>
+    </div>
+    <div id="dialog-content" class="modal-content">Content</div>
+  </div>
+</div>

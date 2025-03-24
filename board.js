@@ -27,19 +27,42 @@ const environmentsHtml = async () => {
         isRunning = true
       }
       html += `<div class="flex-column mr-4 mb-2 py-2 px-4 list-item align-center bg-${statusTxt}">
-                <div class="title full-width text-center header">${env.name.toUpperCase()}</div>
-                  <div class="flex-max text-center">`;
+                <div class="title full-width text-center header">${env.name.toUpperCase()}</div>`
+      if (!!env.versioning) {
+        html += `<div id="${env.name.toLowerCase()}Version" class="select-container"
+                    style="grid-template-areas:
+                      '${env.versioning.properties.map(prop => prop + '-label').join(' ')}'
+                      '${env.versioning.properties.join(' ')}'">`
+        for (let index = 0; index < env.versioning.properties.length; index++) {
+          const version = env.versioning.properties[index];
+          html += `<label for="${version}" style="grid-area:${version}-label">${version} version</label>
+                   <input name="${version}" style="grid-area:${version}" value="${env.versions[version]}" />
+                   <select name="${version}" style="grid-area:${version}" onclick="openVersionSelect(this)" onchange="selectVersion(this)" onblur="blurVersionSelect()">
+                     <option id="fakeOption" value="" class="hidden"></option>`
+          for (let index2 = 0; index2 < env.releases.list.length; index2++) {
+            const release = env.releases.list[index2]
+            html += `<option${release === env.versions[version] ? ' selected' : ''} value="${release}">
+            ${release === env.releases.current ? '- ' : ''}
+              ${release}
+              ${release === env.releases.current ? ' -' : ''}
+            </option>`
+          }
+          html += '</select>'
+        }
+        html += '</div>'
+      }
+      html += '<div class="flex-max text-center">';
       if (env.logs.length === 0) {
         html += 'Not updated yet'
       } else {
         for (let index = 0; index < env.logs.length && index < 3; index++) {
           const log = env.logs[index];
           const date = parseInt(log.date);
-          const logStatus = log.status == 0 ? 'success' : log.status > 0 ? 'error' : 'progress'
+          const logStatus = log.status == 0 ? 'success' : log.status === 3 ? 'warn' : log.status > 0 ? 'error' : 'progress'
           html += `<div 
                     class="sublist-item btn flex item-${logStatus} ${index === 0 ? ' mb-8' : ''}"
                     onclick="showLog('env', '${env.name}', '${env.name}', ${date}, ${log.status}${env.bot  !== undefined ? ', ' + env.bot : ''})">
-                    <div class="icon icon-${logStatus}">${log.status == 0 ? '✔' : log.status > 0 ? '✖' : '⌛'}</div>
+                    <div class="icon icon-${logStatus}">${log.status == 0 ? '✔' : log.status === 3 ? '⚠️' : log.status > 0 ? '✖' : '⌛'}</div>
                     <span class="date">${date}</span></div>`
         }
         if (env.logs.length > 3) {
@@ -93,12 +116,13 @@ const actionsGrid = (actions) => {
     const hasLogs = !!action.logs && action.logs.length > 0
     const status = hasLogs ? action.logs[0].status : -2
     const statusTxt = getStatusTxt(status)
+    const statusInt = parseInt(status)
     const lastRun = hasLogs ? parseInt(action.logs[0].date) : null
     html += `<div class="grid-row">
               <div class="grid-col col-2 justify-center">${action.name}</div>
               <div class="grid-col col-3 justify-center">
                 ${!!lastRun ?
-                  `<div class="icon icon-${statusTxt}">${status == 0 ? '✔' : status > 0 ? '✖' : status == -1 ? '⌛' : ''}</div>
+                  `<div class="icon icon-${statusTxt}">${statusInt == 0 ? '✔' : statusInt === 3 ? '⚠️' : statusInt > 0 ? '✖' : statusInt == -1 ? '⌛' : ''}</div>
                   <span class="date ml-2">${lastRun}</span>` : ''}
               </div>
               <div class="grid-col col-2 justify-center">
@@ -116,6 +140,9 @@ const actionsGrid = (actions) => {
                     onclick="listLogs('action', '${action.key}', '${action.name}'${action.bot  !== undefined && action.bot !== null  ? ', ' + action.bot : ''})">
                     📋<span class="ml-2">LOGS</span>
                   </div>
+                  ${!!action.params && action.params.length > 0 ?
+                    `<select>${action.params.reduce((html, param) => html += `<option value="${param}">${param}</option>`, '')}</select> ` : ''
+                  }
                   <div class="btn condensed primary my-1${status == -1 ? ' btn-disabled' : ''}"
                     onclick="triggerAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">
                     ▶<span class="ml-2">RUN</span>
@@ -173,6 +200,9 @@ const actionsCatalog = (actions) => {
                     onclick="listLogs('action', '${action.key}', '${action.name}'${action.bot  !== undefined && action.bot !== null  ? ', ' + action.bot : ''})">
                     📋<span class="ml-2">LOGS</span>
                   </div>
+                  ${!!action.params && action.params.length > 0 ?
+                  `<select>${action.params.reduce((html, param) => html += `<option value="${param}">${param}</option>`, '')}</select> ` : ''
+                  }
                   <div class="btn condensed primary my-1${status == -1 ? ' btn-disabled' : ''}"
                     onclick="triggerAction(this, '${action.key}'${action.bot  !== undefined ? ', ' + action.bot : ''})">
                     ▶<span class="ml-2">RUN</span>

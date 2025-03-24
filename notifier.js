@@ -15,8 +15,9 @@ const notify = async (subjects, status, data, logFile) => {
       const destination = destinations[index];
       if (!destination.on || 
           (destination.on === 'success' && status === 'ok') ||
+          (destination.on === 'warning' && status === 'warn') ||
           (destination.on === 'failure' && status === 'fail')) {
-        const subject = status === 'ok' ? subjects.ok : subjects.fail
+        const subject = status === 'ok' ? subjects.ok : status === 'warn' ? subjects.warn : subjects.fail
         const host = config.publicHost
         const port = config.port
         const title = config.brand && config.brand.title ? config.brand.title : 'Jaime Board'
@@ -66,6 +67,7 @@ module.exports = {
     if (action.notify) {
       notify({
         ok: `The "${action.name}" action run${!!config.name ? ' at "' + config.name + '"' : ''} was completed successfully`,
+        warn: `The "${action.name}" action run${!!config.name ? ' at "' + config.name + '"' : ''} was completed with warnings`,
         fail: `The "${action.name}" action run${!!config.name ? ' at "' + config.name + '"' : ''} failed`
       }, status, action, logFile)
     }

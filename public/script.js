@@ -1,4 +1,4 @@
-const request = (url, method, data) => {
+const request = (url, method, data, file = false) => {
   let opts = {
     redirect: 'follow',
     headers: {
@@ -9,8 +9,12 @@ const request = (url, method, data) => {
     opts.method = method
   }
   if (data) {
-    opts.headers['Content-Type'] = 'application/json'
-    opts.body = JSON.stringify(data)
+    if (file) {
+      opts.body = data
+    } else {
+      opts.headers['Content-Type'] = 'application/json'
+      opts.body = JSON.stringify(data)
+    }
   }
   return fetch(url, opts)
   .then(async response => {
@@ -93,6 +97,7 @@ const getStatusTxt = (status) => {
   const statInt = parseInt(status)
   switch (statInt) {
     case 0: return 'success'
+    case 3: return 'warn'
     case -2: return 'new'
     case -1: return 'progress'
     default: return 'error'
@@ -135,11 +140,50 @@ const updateEnv = async (btnEl, env, bot) => {
     itemEl.classList.remove('bg-success', 'bg-error', 'bg-new')
     itemEl.classList.add('bg-progress')
     btnEl.classList.add('btn-disabled')
-    const params = bot !== undefined ? {env, bot} : {env}
+    const versionEl = document.getElementById(`${env.toLowerCase()}Version`)
+    let version = {}
+    if (versionEl) {
+      const properties = [...versionEl.querySelectorAll('input')]
+      for (let index = 0; index < properties.length; index++) {
+        const propEl = properties[index]
+        const name = propEl.getAttribute('name')
+        version[name] = propEl.value
+      }
+    }
+    const params = bot !== undefined ? {env, bot, version} : {env, version}
     request('/update','post', params).finally(() => {
        location.reload()
     })
   }
+}
+
+const openVersionSelect = (selectEl) => {
+  const inputEl = selectEl.parentElement.querySelector(`input[name="${selectEl.name}"]`)
+  const selectedOption = selectEl.parentElement.querySelector(`option[value="${inputEl.value}"]`)
+  if (! selectedOption) {
+    const fakeOption = document.getElementById('fakeOption')
+    fakeOption.innerHTML = inputEl.value
+    fakeOption.classList.remove('hidden')
+    fakeOption.selected = true
+  } else {
+    selectedOption.selected = true
+  }
+}
+
+const selectVersion = (selectEl) => {
+  const fakeOption = document.getElementById('fakeOption')
+  if (selectEl !== fakeOption) {
+    const version = selectEl.value
+    selectEl.parentElement.querySelector(`input[name="${selectEl.name}"]`).value = version
+  }
+  fakeOption.innerHTML = ''
+  fakeOption.classList.add('hidden')
+}
+
+const blurVersionSelect = () => {
+  const fakeOption = document.getElementById('fakeOption')
+  fakeOption.innerHTML = ''
+  fakeOption.classList.add('hidden')
 }
 
 const showLog = async (type, key, name, log, status, bot) => {
@@ -151,7 +195,7 @@ const showLog = async (type, key, name, log, status, bot) => {
   const statusTxt = getStatusTxt(status)
   document.querySelector('main').innerHTML = `
     <div class="subtitle header flex align-center header-${statusTxt}">
-      <div class="icon icon-${statusTxt}">${status == 0 ? '✔' : status > 0 ? '✖' : '⌛'}</div>
+      <div class="icon icon-${statusTxt}">${status == 0 ? '✔' : status === 3 ? '⚠️' : status > 0 ? '✖' : '⌛'}</div>
       <span class="mx-1 date">${log}</span>${type === 'env' ? ' on' : ' by'} "${name.toUpperCase()}"</div>
     <pre><code>${logTxt}</code></pre>`
   parseDates()
@@ -172,10 +216,11 @@ const listLogs = async (type, key, name, bot) => {
         const logArray = log.split('-')
         const date = logArray[0]
         const logStatus = getStatusTxt(logArray[1])
+        const statusInt = parseInt(logArray[1])
         html += `<div 
                   class="sublist-item btn flex justify-spaceAround mx-4 my-2 item-${logStatus} ${index === 0 ? ' mb-8' : ''}"
                   onclick="showLog('${type}', '${key}', '${name}', ${date}, ${logArray[1]}${bot  !== undefined ? ', ' + bot : ''})">
-                  <div class="icon icon-${logStatus}">${logArray[1] == 0 ? '✔' : logArray[1] > 0 ? '✖' : '⌛'}</div>
+                  <div class="icon icon-${logStatus}">${statusInt === 0 ? '✔' : statusInt === 3 ? '⚠️' : statusInt > 0 ? '✖' : '⌛'}</div>
                   <span class="date">${date}</span></div>`
       }
     html += '</div>'
@@ -191,7 +236,11 @@ const triggerAction = async (btnEl, actionKey, bot) => {
    if (!btnEl.classList.contains('btn-disabled')) {
     btnEl.classList.add('btn-disabled')
     btnEl.innerHTML = '<div class="icon icon-progress">⌛</div>' + btnEl.innerHTML
-    const params = bot !== null ? {key: actionKey, bot} : {key: actionKey}
+    let params = bot !== null ? {key: actionKey, bot} : {key: actionKey}
+    const selectEl = Array.from(btnEl.parentNode.children).find(node => node.tagName === 'SELECT')
+    if (selectEl && selectEl.value) {
+      params.param = selectEl.value
+    }
     request('/action','post', params).then(() => {
       setTimeout(() => { location.reload() }, 1000 * 60 * 1)
     })
@@ -235,4 +284,20 @@ const actionTab = (id) => {
 
 const openTab = (url) => {
   window.open(url, "_blank")
+}
+
+const sendSmoke = () => {
+  const fileInput = document.querySelector('input[type="file"]')
+  console.log(fileInput.files[0])
+  request('/smoke', 'POST', fileInput.files[0], true).then(() => {
+    document.getElementById('dialog-content').innerHTML = "The smoke test results file was accepted.<br>You'll receive a smoke test notification email if necessary."
+    document.getElementById('dialog-title').innerHTML = 'File accepted'
+    const dialogEl = document.getElementById('dialog')
+    dialogEl.style.display = 'flex'
+  }).catch(() => {
+    document.getElementById('dialog-content').innerHTML = "Please contact the admin."
+    document.getElementById('dialog-title').innerHTML = 'File not accepted'
+    const dialogEl = document.getElementById('dialog')
+    dialogEl.style.display = 'flex'
+  })
 }
