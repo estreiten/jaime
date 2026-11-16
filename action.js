@@ -90,26 +90,26 @@ const runScript = async (action, path, param) => {
       }
       log(logFile, `== ${title} == \r\n${data}`)
       if (process.exitCode === 1) {
-        process.kill()
+        endScript(path, process, logName)
       }
     })
     process.on('uncaughtException', (err) => {
       errorHandler(err, logFile, logName, lock, action)
       process.exitCode = 1
-      process.kill()
+      endScript(path, process, logName)
     })
     process.on('unhandledRejection', (reason, promise) => {
       errorHandler(err, logFile, logName, lock, action)
       process.exitCode = 1
-      process.kill()
+      endScript(path, process, logName)
     })
     process.on('close', code => {
-      afterScript(hasWarning ? 3 : code, logFile, logName, action, path, param, lock)
+      afterScript(code !== 1 && hasWarning ? 3 : code, logFile, logName, action, path, param, lock)
     })
     process.on('error', err => {
       errorHandler(err, logFile, logName, lock, action)
       process.exitCode = 1
-      process.kill()
+      endScript(path, process, logName)
     })
   } else {
     const nodeFile = `${path}/run.js`
@@ -122,6 +122,31 @@ const runScript = async (action, path, param) => {
       fs.renameSync(logFile, `${logName}-0.log`)
       fs.unlinkSync(lock)
     }
+  }
+}
+
+const endScript = (path, process, logName) => {
+  const errorScript = `${path}/error.sh`
+  const logFile = `${logName}-1.log`
+  const cwd = process.cwd
+  process.kill()
+  if (fs.existsSync(errorScript)) {
+    const isWin = os.platform() === "win32"
+    const spawnParams = isWin ? { shell: true } : {}
+    if (cwd) {
+      spawnParams.cwd = cwd
+    }
+    log(logFile, '== Error handling script output == start')
+    const errorProcess = spawn(errorScript, [], spawnParams)
+    errorProcess.stdout.on('data', data => {
+      log(logFile, data)
+    })
+    errorProcess.stderr.on('data', data => {
+      log(logFile, `Error handling script failed:\n ${data}`)
+    })
+    errorProcess.on('close', code => {
+      log(logFile, '== Error handling output == end')
+    })
   }
 }
 
