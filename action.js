@@ -48,6 +48,7 @@ const afterScript = (code, logFile, logName, action, path, param, lock, runError
   fs.renameSync(logFile, newLog)
   if (code === 10) {
     runScript(action, path, param)
+    return
   }
   const finish = () => {
     fs.unlinkSync(lock)

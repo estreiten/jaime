@@ -1,5 +1,6 @@
 const fs = require('fs');
 const { spawnScript } = require('./runner');
+const { spawn } = require('child_process');
 const botManager = require('./bot.js');
 const util = require('./utils.js');
 const notifierService = require('./notifier');
@@ -82,6 +83,7 @@ const runScript = (step, {env, branch, logName, lock, version}, next) => {
       log(logFile, `Trying to checkout to ${branch}...`)
     }
     let exitCode = 0
+    let spawnError = null
     const child = spawnScript(scriptFile, params, env.path)
     child.stdout.on('data', data => {
       log(logFile, data)
@@ -94,6 +96,9 @@ const runScript = (step, {env, branch, logName, lock, version}, next) => {
       log(logFile, `== Stderr == \r\n${data}`)
     })
     child.on('close', code => {
+      if (spawnError) {
+        return endScript(env, logName, lock, null, branch, spawnError)
+      }
       log(logFile, `The ${env.name} environment ${name} process ${code === 0 ? 'succeded' : 'failed'}`)
       if (exitCode) {
         code = exitCode
@@ -111,7 +116,7 @@ const runScript = (step, {env, branch, logName, lock, version}, next) => {
       }
     })
     child.on('error', err => {
-      endScript(env, logName, lock, null, branch, err)
+      spawnError = err
     })
   } else {
     log(logFile, `No ${env.name} environment ${name} script was found`)
@@ -168,9 +173,9 @@ const versionCompare = (v1, v2) => {
 
 const getEnvReleases = async (path, versioning) => {
   return new Promise((resolve, reject) => {
-    const fetch = spawnScript('git', ['fetch'], path)
+    const fetch = spawn('git', ['fetch'], { cwd: path })
     fetch.on('close', () => {
-      const child = spawnScript('git', ['branch','--all', '--list'], path)
+      const child = spawn('git', ['branch','--all', '--list'], { cwd: path })
       let out = ''
       child.stdout.on('data', data => {
         out += data.toString()
