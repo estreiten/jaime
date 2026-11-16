@@ -1,6 +1,5 @@
 const fs = require('fs');
-const os = require('os');
-const { spawn } = require("child_process");
+const { spawnScript } = require('./runner');
 const botManager = require('./bot.js');
 const util = require('./utils.js');
 const notifierService = require('./notifier');
@@ -79,27 +78,22 @@ const runScript = (step, {env, branch, logName, lock, version}, next) => {
   let params = branch ? [branch, logFile] : firstVersion ? [env.versioning.pre + firstVersion, logFile] : [logFile]
   if (fs.existsSync(scriptFile)) {
     log(logFile, `===== ${env.name} environment ${name} started =====`)
-    const isWin = os.platform() === "win32"
-    const spawnParams = isWin ? { shell: true } : {}
-    if (env.path) {
-      spawnParams.cwd = env.path
-    }
     if (step === 'update' && branch) {
       log(logFile, `Trying to checkout to ${branch}...`)
     }
     let exitCode = 0
-    const process = spawn(scriptFile, params, spawnParams)
-    process.stdout.on('data', data => {
+    const child = spawnScript(scriptFile, params, env.path)
+    child.stdout.on('data', data => {
       log(logFile, data)
     })
-    process.stderr.on('data', data => {
+    child.stderr.on('data', data => {
       const errorRx = /error|fatal|failed|exception|critical/i
       if (errorRx.test(data.toString('utf8'))) {
         exitCode = 1
       }
       log(logFile, `== Stderr == \r\n${data}`)
     })
-    process.on('close', code => {
+    child.on('close', code => {
       log(logFile, `The ${env.name} environment ${name} process ${code === 0 ? 'succeded' : 'failed'}`)
       if (exitCode) {
         code = exitCode
@@ -116,7 +110,7 @@ const runScript = (step, {env, branch, logName, lock, version}, next) => {
         endScript(env, logName, lock, code)
       }
     })
-    process.on('error', err => {
+    child.on('error', err => {
       endScript(env, logName, lock, null, branch, err)
     })
   } else {
@@ -174,17 +168,14 @@ const versionCompare = (v1, v2) => {
 
 const getEnvReleases = async (path, versioning) => {
   return new Promise((resolve, reject) => {
-    const isWin = os.platform() === "win32"
-    let spawnParams = isWin ? { shell: true } : {}
-    spawnParams.cwd = path
-    const fetch = spawn('git', ['fetch'], spawnParams)
+    const fetch = spawnScript('git', ['fetch'], path)
     fetch.on('close', () => {
-      const process = spawn('git', ['branch','--all', '--list'], spawnParams)
+      const child = spawnScript('git', ['branch','--all', '--list'], path)
       let out = ''
-      process.stdout.on('data', data => {
+      child.stdout.on('data', data => {
         out += data.toString()
       })
-      process.on('close', code => {
+      child.on('close', code => {
         let releases = {
           list: [],
           current: null

@@ -1,9 +1,8 @@
 const fs = require('fs');
-const os = require('os');
-const { spawn } = require("child_process");
 const cron = require('node-cron');
 const serverName = require('./config').name;
 const actions = require('./config').actions;
+const { spawnScript, killScript } = require('./runner');
 const botManager = require('./bot.js');
 const notifierService = require('./notifier');
 
@@ -42,16 +41,22 @@ const getActions = async () => {
   return myActions.length > 0 ? myActions.concat(botActions) : botActions
 }
 
-const afterScript = (code, logFile, logName, action, path, param, lock) => {
+const afterScript = (code, logFile, logName, action, path, param, lock, runErrorHandler) => {
   const result = code === 0 ? 'succeded' : code === 10 ? 'succeded, re-run requested' : code === 3 ? 'succeded with warnings' : 'failed'
   log(logFile, `==== The "${action.name}" action script ${result} ====`)
   const newLog = `${logName}-${code === null ? 1 : code}.log`
   fs.renameSync(logFile, newLog)
   if (code === 10) {
     runScript(action, path, param)
-  } else {
+  }
+  const finish = () => {
     fs.unlinkSync(lock)
     notifierService.notifyAction(code === 0 ? 'ok' : code === 3 ? 'warn' : 'fail', action, newLog)
+  }
+  if (runErrorHandler) {
+    runErrorScript(action, path, newLog, finish)
+  } else {
+    finish()
   }
 }
 
@@ -67,49 +72,40 @@ const runScript = async (action, path, param) => {
   const logFile = `${logName}.log`
   if (fs.existsSync(scriptFile)) {
     log(logFile, `The "${action.name}" action script is starting`)
-    const isWin = os.platform() === "win32"
-    const spawnParams = isWin ? { shell: true } : {}
     let hasWarning = false
-    if (action.root) {
-      spawnParams.cwd = action.root
+    let runErrorHandler = false
+    const child = spawnScript(scriptFile, param ? [param] : [], action.root)
+    const failAndKill = () => {
+      runErrorHandler = true
+      killScript(child)
     }
-    const process = spawn(scriptFile, param ? [param] : [], spawnParams)
-    process.stdout.on('data', data => {
+    child.stdout.on('data', data => {
       log(logFile, data)
     })
-    process.stderr.on('data', data => {
+    child.stderr.on('data', data => {
       const errorRx = /error|fatal|failed|exception|critical/i
       const warnRx = /warning|deprecated|caution|notice/i
       let title = 'Stderr output'
       if (errorRx.test(data)) {
         title = 'Error'
-        process.exitCode = 1
+        child.exitCode = 1
       } else if (warnRx.test(data)) {
         title = 'Warning'
         hasWarning = true
       }
       log(logFile, `== ${title} == \r\n${data}`)
-      if (process.exitCode === 1) {
-        endScript(path, process, logName)
+      if (child.exitCode === 1) {
+        failAndKill()
       }
     })
-    process.on('uncaughtException', (err) => {
-      errorHandler(err, logFile, logName, lock, action)
-      process.exitCode = 1
-      endScript(path, process, logName)
+    child.on('close', code => {
+      const finalCode = runErrorHandler ? 1 : (code === 0 && hasWarning ? 3 : code)
+      afterScript(finalCode, logFile, logName, action, path, param, lock, runErrorHandler)
     })
-    process.on('unhandledRejection', (reason, promise) => {
+    child.on('error', err => {
       errorHandler(err, logFile, logName, lock, action)
-      process.exitCode = 1
-      endScript(path, process, logName)
-    })
-    process.on('close', code => {
-      afterScript(code !== 1 && hasWarning ? 3 : code, logFile, logName, action, path, param, lock)
-    })
-    process.on('error', err => {
-      errorHandler(err, logFile, logName, lock, action)
-      process.exitCode = 1
-      endScript(path, process, logName)
+      child.exitCode = 1
+      failAndKill()
     })
   } else {
     const nodeFile = `${path}/run.js`
@@ -125,29 +121,30 @@ const runScript = async (action, path, param) => {
   }
 }
 
-const endScript = (path, process, logName) => {
+const runErrorScript = (action, path, logFile, done) => {
   const errorScript = `${path}/error.sh`
-  const logFile = `${logName}-1.log`
-  const cwd = process.cwd
-  process.kill()
-  if (fs.existsSync(errorScript)) {
-    const isWin = os.platform() === "win32"
-    const spawnParams = isWin ? { shell: true } : {}
-    if (cwd) {
-      spawnParams.cwd = cwd
-    }
-    log(logFile, '== Error handling script output == start')
-    const errorProcess = spawn(errorScript, [], spawnParams)
-    errorProcess.stdout.on('data', data => {
-      log(logFile, data)
-    })
-    errorProcess.stderr.on('data', data => {
-      log(logFile, `Error handling script failed:\n ${data}`)
-    })
-    errorProcess.on('close', code => {
-      log(logFile, '== Error handling output == end')
-    })
+  if (!fs.existsSync(errorScript)) {
+    return done()
   }
+  let finished = false
+  const finish = () => {
+    if (!finished) {
+      finished = true
+      done()
+    }
+  }
+  log(logFile, '== Error handling script output == start')
+  const errorProcess = spawnScript(errorScript, [], action.root)
+  errorProcess.stdout.on('data', data => log(logFile, data))
+  errorProcess.stderr.on('data', data => log(logFile, `== Error handling script stderr ==\r\n${data}`))
+  errorProcess.on('error', err => {
+    log(logFile, `Error handling script could not run: ${err.message}`)
+    finish()
+  })
+  errorProcess.on('close', () => {
+    log(logFile, '== Error handling script output == end')
+    finish()
+  })
 }
 
 const execute = (actionKey, param, tries = 3) => {
