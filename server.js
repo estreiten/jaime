@@ -241,5 +241,6 @@ const port = config.port || 80
 app.listen(port, () => {
   console.log(`Jaime listening on ${port}`)
   actionManager.initScheduler()
-  hookListener.init()
+  if (config.hook) 
+    hookListener.init()
 })
