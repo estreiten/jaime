@@ -211,7 +211,7 @@ const listLogs = async (type, key, name, bot) => {
   if (logs.length > 0) {
     let html = `
       <div class="flex flex-column">`
-      for (let index = 0; index <logs.length; index++) {
+      for (let index = 0; index <Math.min(logs.length, 200); index++) {
         const log = logs[index]
         const logArray = log.split('-')
         const date = logArray[0]
