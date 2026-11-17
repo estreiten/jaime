@@ -5,7 +5,15 @@ const botManager = require('./bot.js');
 const util = require('./utils.js');
 const notifierService = require('./notifier');
 const environments = require('./config').env;
- 
+
+// Versioning without "properties" gets a single "current" combo, driven by the checked-out branch
+for (const envName in environments) {
+  const versioning = environments[envName].versioning
+  if (versioning && !(Array.isArray(versioning.properties) && versioning.properties.length > 0)) {
+    versioning.properties = ['current']
+  }
+}
+
 const getEnvironments = async () => {
   let envs = []
   for (const envName in environments) {
@@ -15,10 +23,10 @@ const getEnvironments = async () => {
       if (!!env.versioning) {
         try {
           env.releases = await getEnvReleases(env.path, env.versioning)
-          env.versions = getEnvVersions(env.name, env.path)
+          env.versions = getEnvVersions(env.name, env.path, env.versioning, env.releases)
         } catch(e) {
-          env.releases = []
-          env.versions = []
+          env.releases = { list: [], current: null }
+          env.versions = {}
           console.error(e)
         }
       }
@@ -225,9 +233,13 @@ const getEnvReleases = async (path, versioning) => {
   })
 }
 
-const getEnvVersions = (name, path) => {
+const getEnvVersions = (name, path, versioning, releases) => {
   const file = `${__dirname}/env/${name}/version/get.js`
-  return fs.existsSync(file) ? require(file)(path) : {}
+  if (fs.existsSync(file)) {
+    return require(file)(path)
+  }
+  // No get.js: the current version is the checked-out release branch (without the "pre" prefix)
+  return releases && releases.current ? { [versioning.properties[0]]: releases.current } : {}
 }
 
 const setEnvVersions = (name, path, versions) => {

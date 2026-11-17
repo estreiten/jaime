@@ -218,6 +218,10 @@ So the version combos will be filled with these values and upon selection that s
 - The options 'release-alpha' and 'release-dummy-test' won't appear in the version combos, you won't be able to deploy them.
 - There will be two combos displayed in the Name env box, under the names 'current' and 'prior'.
 The values of the first one, 'current' in this case, are the ones used to change the repository branch.
+- `properties` is optional: if omitted, a single 'current' combo is displayed.
+
+If there's no `version/get.js` (see below), the current version is taken from the checked-out branch name (without the `pre` prefix).
+Selecting another release in the combo and pressing Update checks out that branch, without reading or writing any version file in the code.
 
 ### Version config update
 If you have a config file where the versions are specified, Jaime can update them for you when the release changes.

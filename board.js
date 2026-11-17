@@ -36,7 +36,7 @@ const environmentsHtml = async () => {
         for (let index = 0; index < env.versioning.properties.length; index++) {
           const version = env.versioning.properties[index];
           html += `<label for="${version}" style="grid-area:${version}-label">${version} version</label>
-                   <input name="${version}" style="grid-area:${version}" value="${env.versions[version]}" />
+                   <input name="${version}" style="grid-area:${version}" value="${env.versions[version] || ''}" />
                    <select name="${version}" style="grid-area:${version}" onclick="openVersionSelect(this)" onchange="selectVersion(this)" onblur="blurVersionSelect()">
                      <option id="fakeOption" value="" class="hidden"></option>`
           for (let index2 = 0; index2 < env.releases.list.length; index2++) {
