@@ -104,8 +104,10 @@ const runScript = (step, {env, branch, logName, lock, version}, next) => {
         code = exitCode
       }
       if (code === 0) {
-        log(logFile, `Trying to set version information to ${JSON.stringify(version, null, 2)}`)
-        setEnvVersions(env.name, env.path, version)
+        if (env.versioning) {
+          log(logFile, `Trying to set version information to ${JSON.stringify(version, null, 2)}`)
+          setEnvVersions(env.name, env.path, version)
+        }
         if (next && next.length > 0) {
           runScript(next.shift(), {env, branch, logName, lock, version}, next)
         } else {
@@ -176,9 +178,13 @@ const getEnvReleases = async (path, versioning) => {
     const fetch = spawn('git', ['fetch'], { cwd: path })
     fetch.on('close', () => {
       const child = spawn('git', ['branch','--all', '--list'], { cwd: path })
+      let err = ''
       let out = ''
       child.stdout.on('data', data => {
         out += data.toString()
+      })
+      child.stderr.on('data', data => {
+        err += data.toString()
       })
       child.on('close', code => {
         let releases = {
@@ -212,7 +218,7 @@ const getEnvReleases = async (path, versioning) => {
           }
           resolve(releases)
         } else {
-          reject('getEnvReleases:: "Git branch" command failed')
+          reject(`getEnvReleases:: "Git branch" command failed: ${err.trim()}`)
         }
       })
     })
@@ -220,14 +226,15 @@ const getEnvReleases = async (path, versioning) => {
 }
 
 const getEnvVersions = (name, path) => {
-  const versionGet = require(`${__dirname}/env/${name}/version/get.js`)
-  const versions = versionGet(path)
-  return versions
+  const file = `${__dirname}/env/${name}/version/get.js`
+  return fs.existsSync(file) ? require(file)(path) : {}
 }
 
 const setEnvVersions = (name, path, versions) => {
-  const versionSet = require(`${__dirname}/env/${name}/version/set.js`)
-  versionSet(path, versions)
+  const file = `${__dirname}/env/${name}/version/set.js`
+  if (fs.existsSync(file)) {
+    require(file)(path, versions)
+  }
 }
 
 const getEnvLogs = (envName) => {
