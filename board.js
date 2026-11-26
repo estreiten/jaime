@@ -1,6 +1,9 @@
 const envManager = require('./env.js');
 const actionManager = require('./action.js');
 
+// Display only: "1.2" is shown as "1.2.0"; the real version is still what gets selected and sent
+const displayVersion = (version) => /^\d+\.\d+$/.test(version) ? `${version}.0` : version
+
 const getStatusTxt = (status) => {
   if (isNaN(status)) {
     return 'progress'
@@ -35,15 +38,16 @@ const environmentsHtml = async () => {
                       '${env.versioning.properties.join(' ')}'">`
         for (let index = 0; index < env.versioning.properties.length; index++) {
           const version = env.versioning.properties[index];
+          const currentVersion = env.versions[version] || ''
           html += `<label for="${version}" style="grid-area:${version}-label">${version} version</label>
-                   <input name="${version}" style="grid-area:${version}" value="${env.versions[version] || ''}" />
+                   <input name="${version}" style="grid-area:${version}" value="${displayVersion(currentVersion)}" data-real="${currentVersion}" />
                    <select name="${version}" style="grid-area:${version}" onclick="openVersionSelect(this)" onchange="selectVersion(this)" onblur="blurVersionSelect()">
                      <option id="fakeOption" value="" class="hidden"></option>`
           for (let index2 = 0; index2 < env.releases.list.length; index2++) {
             const release = env.releases.list[index2]
             html += `<option${release === env.versions[version] ? ' selected' : ''} value="${release}">
             ${release === env.releases.current ? '- ' : ''}
-              ${release}
+              ${displayVersion(release)}
               ${release === env.releases.current ? ' -' : ''}
             </option>`
           }

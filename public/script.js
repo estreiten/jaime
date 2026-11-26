@@ -147,7 +147,9 @@ const updateEnv = async (btnEl, env, bot) => {
       for (let index = 0; index < properties.length; index++) {
         const propEl = properties[index]
         const name = propEl.getAttribute('name')
-        version[name] = propEl.value
+        // Send the real version behind the displayed one (e.g. "1.2" shown as "1.2.0"), unless the user typed another
+        const real = propEl.dataset.real
+        version[name] = real && displayVersion(real) === propEl.value ? real : propEl.value
       }
     }
     const params = bot !== undefined ? {env, bot, version} : {env, version}
@@ -157,9 +159,13 @@ const updateEnv = async (btnEl, env, bot) => {
   }
 }
 
+// Display only: "1.2" is shown as "1.2.0" (same rule as board.js)
+const displayVersion = (version) => /^\d+\.\d+$/.test(version) ? `${version}.0` : version
+
 const openVersionSelect = (selectEl) => {
   const inputEl = selectEl.parentElement.querySelector(`input[name="${selectEl.name}"]`)
-  const selectedOption = selectEl.parentElement.querySelector(`option[value="${inputEl.value}"]`)
+  const real = inputEl.dataset.real && displayVersion(inputEl.dataset.real) === inputEl.value ? inputEl.dataset.real : inputEl.value
+  const selectedOption = selectEl.parentElement.querySelector(`option[value="${real}"]`)
   if (! selectedOption) {
     const fakeOption = document.getElementById('fakeOption')
     fakeOption.innerHTML = inputEl.value
@@ -174,7 +180,9 @@ const selectVersion = (selectEl) => {
   const fakeOption = document.getElementById('fakeOption')
   if (selectEl !== fakeOption) {
     const version = selectEl.value
-    selectEl.parentElement.querySelector(`input[name="${selectEl.name}"]`).value = version
+    const inputEl = selectEl.parentElement.querySelector(`input[name="${selectEl.name}"]`)
+    inputEl.value = displayVersion(version)
+    inputEl.dataset.real = version
   }
   fakeOption.innerHTML = ''
   fakeOption.classList.add('hidden')
