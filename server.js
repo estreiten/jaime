@@ -79,7 +79,7 @@ app.post('/update', async (req, res) => {
             res.sendStatus(400)
           }
         } else {
-          const status = await botManager.updateEnv(req.body.bot, req.body.env)
+          const status = await botManager.updateEnv(req.body.bot, req.body.env, null, req.body.version)
           res.sendStatus(status)
         }
       } else {

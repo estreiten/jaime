@@ -92,13 +92,15 @@ module.exports = {
       return null
     }
   },
-  updateEnv: async (botIndex, envName, branch) => {
+  updateEnv: async (botIndex, envName, branch, version) => {
     return new Promise((resolve) => {
       if (botIndex < config.length) {
         const botConfig = config[botIndex]
         let data = { env: envName }
         if (!!branch) {
           data.branch = branch
+        } else if (version && Object.keys(version).length > 0) {
+          data.version = version   // the bot turns it into a branch with its own "pre"
         }
         const req = util.request({
           hostname: botConfig.host,

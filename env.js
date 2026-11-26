@@ -6,6 +6,9 @@ const util = require('./utils.js');
 const notifierService = require('./notifier');
 const environments = require('./config').env;
 
+// Never let git wait for credentials: without a terminal it would hang forever
+const gitEnv = { ...process.env, GIT_TERMINAL_PROMPT: '0', GCM_INTERACTIVE: 'never' }
+
 // Versioning without "properties" gets a single "current" combo, driven by the checked-out branch
 for (const envName in environments) {
   const versioning = environments[envName].versioning
@@ -183,9 +186,9 @@ const versionCompare = (v1, v2) => {
 
 const getEnvReleases = async (path, versioning) => {
   return new Promise((resolve, reject) => {
-    const fetch = spawn('git', ['fetch'], { cwd: path })
+    const fetch = spawn('git', ['fetch'], { cwd: path, env: gitEnv })
     fetch.on('close', () => {
-      const child = spawn('git', ['branch','--all', '--list'], { cwd: path })
+      const child = spawn('git', ['branch','--all', '--list'], { cwd: path, env: gitEnv })
       let err = ''
       let out = ''
       child.stdout.on('data', data => {

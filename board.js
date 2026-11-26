@@ -28,7 +28,7 @@ const environmentsHtml = async () => {
       }
       html += `<div class="flex-column mr-4 mb-2 py-2 px-4 list-item align-center bg-${statusTxt}">
                 <div class="title full-width text-center header">${env.name.toUpperCase()}</div>`
-      if (!!env.versioning) {
+      if (!!env.versioning && !!env.releases) {
         html += `<div id="${env.name.toLowerCase()}Version" class="select-container"
                     style="grid-template-areas:
                       '${env.versioning.properties.map(prop => prop + '-label').join(' ')}'
