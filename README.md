@@ -258,12 +258,10 @@ If the non-existing version is set in the first combo, no branch changes will be
 You have a couple of config properties to get rid of Jaime titles and use your own branding.<br>
 In the `config.js` file:
 
-    branding: [
-      {
-        tab: 'tab text',
-        title: 'board title'
-      }
-    ]
+    brand: {
+      tab: 'tab text',
+      title: 'board title'
+    }
 
 ## Internal architecture for the curious mind
 - To avoid multiple instances of the same env/action being run, we create a ".lock" file inside the env/action folder. 
