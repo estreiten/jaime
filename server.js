@@ -7,6 +7,10 @@ const botManager = require('./bot.js');
 const actionManager = require('./action.js');
 const board = require('./board.js');
 
+const smokeEnabled = config.smoke !== false
+const SMOKE_MENU = `    <div class="v-separator"></div>
+    <div class="btn inline" onclick="request('/smoke')">SMOKE</div>`
+
 const express = require('express');
 const app = express();
 
@@ -26,6 +30,7 @@ app.get('/', async (req, res) => {
     let html = fs.readFileSync('index.html', 'utf8');
     html = html.replace('{{tab}}', tab)
     html = html.replace('{{title}}', title)
+    html = html.replace('{{smokeMenu}}', smokeEnabled ? SMOKE_MENU : '')
     res.send(html)
   } catch (err) {
     console.error(err.message)
@@ -204,6 +209,8 @@ app.post('/toggle', async (req, res) => {
   }
 })
 
+// Smoke tab: enabled unless config.smoke === false (then the routes don't exist: 404)
+if (smokeEnabled) {
 app.get('/smoke', async (req, res) => {
   try {
     if (authorized(req)) {
@@ -236,6 +243,7 @@ app.post('/smoke', async (req, res) => {
     res.sendStatus(500)
   }
 })
+}
 
 const port = config.port || 80
 app.listen(port, () => {
